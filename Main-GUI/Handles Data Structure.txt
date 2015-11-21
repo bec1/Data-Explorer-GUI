@@ -1,0 +1,46 @@
+handles.all
+	filenames
+	names
+	editable
+	data
+	num_added
+
+handles.current
+	row
+	column
+	filename
+	values
+	
+	
+handles.load
+	folder
+
+
+	
+	
+	
+function Data_Explorer_OpeningFcn
+what	handles.all.names,editable,data
+
+function	update_data_explorer_table
+Calls		Rescan_Btn_Callback				handles.all.filenames,num_added,data
+			Select_Folder_Btn_Callback		handles.all.filenames,num_added,data
+			Properties_Menu_Callback		handles.all.names,editabels,filenames,num_added,data
+Needs		handles.all.names,editable,data
+Update		Data_Explorer_Table
+
+function	get_all_name_value
+Needs		handles.all.filenames,names
+Update		handles.all.data
+
+
+
+
+function [] = write_snippet_string(name,value)
+
+
+
+
+
+
+

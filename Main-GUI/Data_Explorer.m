@@ -53,7 +53,8 @@ function Data_Explorer_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to Data_Explorer (see VARARGIN)
 
 % Add path for functions
-addpath('C:\Users\Elder\Documents\GitHub\Image-Processing-Parth\Matlab-Functions-Image-Processing');
+% addpath('C:\Users\Elder\Documents\GitHub\Image-Processing-Parth\Matlab-Functions-Image-Processing');
+addpath('C:\Users\Parth Patel\Documents\GitHub\Image-Processing\Matlab-Functions-Image-Processing');
 
 % Disable Other Buttons until Folder has been selected
 set(handles.Properties_Menu,'Enable','off');
@@ -61,7 +62,7 @@ set(handles.Rescan_Btn,'Enable','off');
 
 
 % Initialize Table
-col_names = {'Filename'}; col_format = {'text'}; col_width = {160}; col_edit = logical([0]);
+col_names = {'Filename'}; col_format = {'text'}; col_width = {50}; col_edit = logical([0]);
 default_data = {'ImgA' ; 'ImgB' ; 'ImgC' ; 'ImgD'};
 t = handles.Data_Explorer_Table;
 set(t,'ColumnName',col_names,'ColumnEditable',col_edit,'ColumnWidth',col_width,'RearrangeableColumns','on','Data',default_data);
@@ -247,7 +248,8 @@ filenames = handles.all.filenames;
 names = handles.all.names;
 data = cell(length(filenames),length(names));
 for i = 1:length(filenames)
-    values = num2cell(zeros(size(names))); % values = Julian(filenames{i},names)
+%     values = num2cell(zeros(size(names)));  
+    values = GetSnippetValues(filenames{i},names);
     data{i,1} = filenames{i};
     for j = 2:length(names)
         data{i,j} = values{j};
@@ -258,7 +260,7 @@ handles.all.data = data;
 function handles = update_current(handles)
 row = handles.current.row;
 fname = handles.all.filenames{row};
-fpath = fullfile(handles.load.folder,fname);disp(fpath);
+fpath = fullfile(handles.load.folder,fname);
 % additional values for selected file??
 raw_img = load_img(fpath);
 axes(handles.Cropped_Image_Axes); imshow(raw_img);
