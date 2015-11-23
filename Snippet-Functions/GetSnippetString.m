@@ -39,8 +39,8 @@ match_timestamp = '01-01-0000_00_00_00';
 match_snippet_line = 'empty';
 
 %%% Set tolerances for snippet match in seconds
-lag = 3;
-advance = 3;
+lag = 10;
+advance = 10;
 
 %%% Identify matching snippet file
 

@@ -22,7 +22,7 @@ function varargout = Data_Explorer(varargin)
 
 % Edit the above text to modify the response to help Data_Explorer
 
-% Last Modified by GUIDE v2.5 19-Nov-2015 18:18:31
+% Last Modified by GUIDE v2.5 23-Nov-2015 01:27:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,13 +53,14 @@ function Data_Explorer_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to Data_Explorer (see VARARGIN)
 
 % Add path for functions
-% addpath('C:\Users\Elder\Documents\GitHub\Image-Processing-Parth\Matlab-Functions-Image-Processing');
-addpath('C:\Users\Parth Patel\Documents\GitHub\Image-Processing\Matlab-Functions-Image-Processing');
+root_dir = fileparts(pwd);
+addpath(root_dir);
+addpath(fullfile(root_dir,'Additional-Functions'));
+addpath(fullfile(root_dir,'Snippet-Functions'));
 
 % Disable Other Buttons until Folder has been selected
 set(handles.Properties_Menu,'Enable','off');
 set(handles.Rescan_Btn,'Enable','off');
-
 
 % Initialize Table
 col_names = {'Filename'}; col_format = {'text'}; col_width = {50}; col_edit = logical([0]);
@@ -69,6 +70,11 @@ set(t,'ColumnName',col_names,'ColumnEditable',col_edit,'ColumnWidth',col_width,'
 handles.all.names = col_names;
 handles.all.editable = col_edit;
 handles.all.data = default_data;
+
+% Initialize Needed Variables
+handles.current.row = 1;
+handles.all.max_od = 0.5; set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
+handles.all.auto_crop = 0; set(handles.Auto_Recrop_Input,'Value',0);
 
 % Choose default command line output for Data_Explorer
 handles.output = hObject;
@@ -106,7 +112,9 @@ function Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 if length(eventdata.Indices) && isfield(handles.all,'filenames')
     handles.current.row = eventdata.Indices(1);
-    handles = update_current(handles);
+    handles.current.class = Current_Image(fullfile(handles.load.folder,handles.all.filenames{handles.current.row}));
+    if isfield(handles,'crop') && isnan(handles.current.class.crop_set(1)) && handles.all.auto_crop, handles.current.class.crop_set = handles.crop.settings; end
+    plot_current_image(handles);
     guidata(hObject, handles);
 end
 
@@ -204,13 +212,79 @@ function Crop_Btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% If there are no images selected, then exit the function
+if ~isfield(handles.current,'class'),disp('Minor Error: Please Select an Image Before Cropping!'); return; end
+% If this is the first time using crop, ask user for crop settings.
+if ~isfield(handles,'crop')
+    axes(handles.Cropped_Image_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
+    handles.crop.settings = getrect(handles.Cropped_Image_Axes);
+% Ask user for new crop settings if image's crop setting is same as current
+elseif handles.current.class.crop_set == handles.crop.settings
+    axes(handles.Cropped_Image_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
+    handles.crop.settings = getrect(handles.Cropped_Image_Axes);    
+end
+% Save crop settings
+handles.current.class.crop_set = handles.crop.settings;
+% Update Image
+plot_current_image(handles);
+% Update handles
+guidata(hObject, handles);
 
 
 
 
+function Max_OD_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Max_OD_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+input = str2double(get(hObject,'String'));
+if input > 0, handles.all.max_od = input; end
+plot_current_image(handles);
+% Update handles
+guidata(hObject, handles);
 
 
+% --- Executes during object creation, after setting all properties.
+function Max_OD_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Max_OD_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
 
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in Max_OD_p_Btn.
+function Max_OD_p_Btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Max_OD_p_Btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.all.max_od = handles.all.max_od + 0.1;
+set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
+plot_current_image(handles);
+guidata(hObject, handles);
+
+% --- Executes on button press in Max_OD_m_Btn.
+function Max_OD_m_Btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Max_OD_m_Btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.all.max_od = handles.all.max_od - 0.1;
+if handles.all.max_od <= 0.0000001, handles.all.max_od = 0.1; end
+set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
+plot_current_image(handles);
+guidata(hObject, handles);
+
+% --- Executes on button press in Auto_Recrop_Input.
+function Auto_Recrop_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Auto_Recrop_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.all.auto_crop = get(hObject,'Value');
+guidata(hObject, handles);
 
 
 
@@ -250,6 +324,8 @@ data = cell(length(filenames),length(names));
 for i = 1:length(filenames)
 %     values = num2cell(zeros(size(names)));  
     values = GetSnippetValues(filenames{i},names);
+    if length(values)~=length(names),values = num2cell(zeros(size(names)));end
+    if ~iscell(values),values=num2cell(values);end
     data{i,1} = filenames{i};
     for j = 2:length(names)
         data{i,j} = values{j};
@@ -257,13 +333,17 @@ for i = 1:length(filenames)
 end
 handles.all.data = data;
 
-function handles = update_current(handles)
-row = handles.current.row;
-fname = handles.all.filenames{row};
-fpath = fullfile(handles.load.folder,fname);
-% additional values for selected file??
-raw_img = load_img(fpath);
-axes(handles.Cropped_Image_Axes); imshow(raw_img);
-handles.current.filename = fname;
-handles.current.raw_img = raw_img;
+function plot_current_image(handles)
+if isfield(handles.current,'class') 
+    axes(handles.Cropped_Image_Axes); imshow(handles.current.class.get_image_data,[0,handles.all.max_od]);
+    axes(handles.Image1_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
+end
+
+
+
+
+
+
+
+
 
