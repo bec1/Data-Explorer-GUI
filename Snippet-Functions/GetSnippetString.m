@@ -23,8 +23,6 @@ user_folder = fileparts(fileparts(userpath));
 dropbox_mit_BEC1 = '/Dropbox (MIT)/BEC1/';
 snippet_folder = (strcat(user_folder,dropbox_mit_BEC1,'Image Data and Cicero Files/Data - Raw Images/Snippet_output/'));
 
-% EDITS MADE FOR PARTH HOME PC
-snippet_folder = 'D:\Dropbox Sync\Dropbox (MIT)\BEC1\Image Data and Cicero Files\Data - Raw Images\Snippet_output';
 
 else
 

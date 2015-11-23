@@ -30,7 +30,7 @@ classdef Current_Image
                 obj.filepath = filepath;
                 [pathstr,obj.filename,obj.fileext] = fileparts(filepath);
                 [pathstr,name,~] = fileparts(pathstr);
-                obj.analyzed_dir = fullfile(pathstr,[name,'-Analyzed-Test']);
+                obj.analyzed_dir = fullfile(pathstr,[name,'-Analyzed']);
                 if ~exist(obj.analyzed_dir,'dir'), mkdir(obj.analyzed_dir); end
                 obj.analyzed_path = fullfile(obj.analyzed_dir,[obj.filename,'.mat']);
                 if ~exist(obj.analyzed_path,'file'), save(obj.analyzed_path,'filepath'); end
