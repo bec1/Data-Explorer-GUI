@@ -57,7 +57,6 @@ root_dir = fileparts(pwd);
 addpath(root_dir);
 addpath(fullfile(root_dir,'Additional-Functions'));
 addpath(fullfile(root_dir,'Snippet-Functions'));
-addpath(fullfile(root_dir,'Additional-GUIs'));
 
 % Disable Other Buttons until Folder has been selected
 set(handles.Properties_Menu,'Enable','off');
@@ -336,9 +335,10 @@ function handles = get_all_name_value(handles)
 filenames = handles.all.filenames;
 names = handles.all.names;
 data = cell(length(filenames),length(names));
-start = 1;
-if handles.all.num_added > 0.1, start = length(filenames) - handles.all.num_added + 1; end
-for i = start:length(filenames)
+if handles.all.num_added > 0.1
+    start = length(filenames) - handles.num_added +1;
+
+for i = 1:length(filenames)
 %     values = num2cell(zeros(size(names)));  
     values = GetSnippetValues(filenames{i},names);
     if length(values)~=length(names),values = num2cell(zeros(size(names)));end

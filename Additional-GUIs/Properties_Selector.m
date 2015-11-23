@@ -54,11 +54,10 @@ function Properties_Selector_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Get all property Names and Initialize the Table
 handles = get_all_names(handles); 
-all_logical = cell(size(handles.all_names));
-for i =1:length(all_logical)
-    all_logical{i} = false;
-end
-data = [handles.all_names,all_logical,all_logical];
+all_include = cell(size(handles.all_names));
+for i =1:length(all_include), all_include{i} = false; end
+all_editables = all_include; all_include{1} = true;
+data = [handles.all_names,all_include,all_editables];
 set(handles.Property_Table,'Data',data);
 
 % Choose default command line output for Properties_Selector
@@ -131,4 +130,4 @@ uiresume(handles.figure1);
 % --- USER DEFINED FUNCTION ---
 function handles = get_all_names(handles)
 % Get from Julian's Program, Make sure its column cell
-handles.all_names = {'TOF';'RF23';'IRcomp';'Side green evap';'ImagFreq1';'IterationNum'};
+handles.all_names = {'Filename';'TOF';'RF23';'IRcomp';'Side green evap';'ImagFreq1';'IterationNum'};
