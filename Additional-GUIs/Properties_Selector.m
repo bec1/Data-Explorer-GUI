@@ -22,7 +22,7 @@ function varargout = Properties_Selector(varargin)
 
 % Edit the above text to modify the response to help Properties_Selector
 
-% Last Modified by GUIDE v2.5 19-Nov-2015 00:03:07
+% Last Modified by GUIDE v2.5 24-Nov-2015 22:52:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -121,6 +121,36 @@ uiresume(handles.figure1);
 
 
 
+% --- Executes on button press in Add_Prop_Btn.
+function Add_Prop_Btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Add_Prop_Btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% old_data = get(handles.Property_Table,'Data');
+
+
+
+function Add_Prop_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Add_Prop_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Add_Prop_Input as text
+%        str2double(get(hObject,'String')) returns contents of Add_Prop_Input as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Add_Prop_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Add_Prop_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 
 
@@ -130,4 +160,5 @@ uiresume(handles.figure1);
 % --- USER DEFINED FUNCTION ---
 function handles = get_all_names(handles)
 % Get from Julian's Program, Make sure its column cell
-handles.all_names = {'Filename';'TOF';'RF23';'IRcomp';'Side green evap';'ImagFreq1';'IterationNum'};
+handles.all_names = {'Filename';'TOF';'RF23';'IRcomp';'Side green evap';'ImagFreq1';'IterationNum';'Spect Time';'Spect Volt'};
+

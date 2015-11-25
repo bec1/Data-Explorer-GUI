@@ -319,7 +319,7 @@ function handles = get_all_fits_files(handles)
 t = dir(fullfile(handles.load.folder,'*.fits'));
 all_filenames = cell(length(t),1);
 for i=1:length(t)
-    all_filenames{i} = t(i).name;
+    all_filenames{i} = t(length(t)-i+1).name;
 end
 handles.all.filenames = all_filenames;
 
@@ -337,7 +337,7 @@ filenames = handles.all.filenames;
 names = handles.all.names;
 data = cell(length(filenames),length(names));
 start = 1;
-if handles.all.num_added > 0.1, start = length(filenames) - handles.all.num_added + 1; end
+% if handles.all.num_added > 0.1, start = length(filenames) - handles.all.num_added + 1; end
 for i = start:length(filenames)
 %     values = num2cell(zeros(size(names)));  
     values = GetSnippetValues(filenames{i},names);
