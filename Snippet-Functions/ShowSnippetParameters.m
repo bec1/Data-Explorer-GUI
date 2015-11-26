@@ -24,7 +24,7 @@ user_folder = fileparts(fileparts(userpath));
 dropbox_mit_BEC1 = '/Dropbox (MIT)/BEC1/';
 img_subfolder = strcat('Image Data and Cicero Files/Data - Raw Images/',year_img,...
     '/',month_img,'/',day_img,'/');
-img_folder = strcat(user_folder,dropbox_mit_BEC1,img_subfolder);
+img_folder = fullfile(user_folder,dropbox_mit_BEC1,img_subfolder);
 
 
 %%% get the snippet strings for each image

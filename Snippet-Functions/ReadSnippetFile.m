@@ -26,6 +26,8 @@ end
 % For more information, see the TEXTSCAN documentation.
 formatSpec = '%{MM-dd-yyyy_HH_mm_ss}D%s%[^\n\r]';
 
+try
+
 %% Open the text file.
 fileID = fopen(filename,'r');
 
@@ -55,9 +57,17 @@ fclose(fileID);
 timestamp = dataArray{:, 1};
 parameter_string = dataArray{:, 2};
 
+
 % For code requiring serial dates (datenum) instead of datetime, uncomment
 % the following line(s) below to return the imported dates as datenum(s).
 
 % timestamp=datenum(timestamp);
 
-
+catch
+    warning('Could not read the snippet file.')
+    timestamp_string = {'01-01-0000_00_00_00'};
+    format_in = 'mm-dd-yyyy_HH_MM_ss';
+    timestamp = datenum(timestamp_string,format_in);
+    parameter_string = {'empty'};
+    
+end
