@@ -1,4 +1,5 @@
 classdef Data_Handler
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%% PROPERTIES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,6 +87,17 @@ function obj = update_data(obj,all)
     obj.all_values = flipud(new_values);
     obj.added_images = added;
 end % update_data
+
+%%%%%%%%%%%%%%%%%%%%%%% Extract All Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function values = extract_all_values(obj)
+    % Load all data from snippet
+    
+    % Load all values from 
+    
+    % Extract needed name/value pairs
+    values = {};
+end % extract all values
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% Getter & Setter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

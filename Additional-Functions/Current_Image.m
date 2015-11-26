@@ -21,7 +21,11 @@ properties
     values
 
     % Cropping
-    crop_set;
+    crop_set
+    
+    % Notes and Hidden
+    notes
+    hide
 end
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,6 +94,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%% Getter and Setter Functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function data = get.raw_data(obj), data = load_img(obj.filepath); end
 % Crop Settings
 function obj = set.crop_set(obj,crop_set)
     % Validate crop settings
@@ -105,7 +110,7 @@ function crop_set = get.crop_set(obj)
         crop_set = [NaN NaN NaN NaN];
     end
 end
-function data = get.raw_data(obj), data = load_img(obj.filepath); end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -22,7 +22,7 @@ function varargout = Data_Explorer(varargin)
 
 % Edit the above text to modify the response to help Data_Explorer
 
-% Last Modified by GUIDE v2.5 23-Nov-2015 01:27:26
+% Last Modified by GUIDE v2.5 26-Nov-2015 15:09:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,18 +64,18 @@ set(handles.Properties_Menu,'Enable','off');
 set(handles.Rescan_Btn,'Enable','off');
 
 % Initialize Table
-col_names = {'Filename'}; col_format = {'text'}; col_width = {50}; col_edit = logical([0]);
-default_data = {'ImgA' ; 'ImgB' ; 'ImgC' ; 'ImgD'};
-t = handles.Data_Explorer_Table;
-set(t,'ColumnName',col_names,'ColumnEditable',col_edit,'ColumnWidth',col_width,'RearrangeableColumns','on','Data',default_data);
-handles.all.names = col_names;
-handles.all.editable = col_edit;
-handles.all.data = default_data;
+% % % % % % % % % % col_names = {'Filename'}; col_format = {'text'}; col_width = {50}; col_edit = logical([0]);
+% % % % % % % % % % default_data = {'ImgA' ; 'ImgB' ; 'ImgC' ; 'ImgD'};
+% % % % % % % % % % t = handles.Data_Explorer_Table;
+% % % % % % % % % % set(t,'ColumnName',col_names,'ColumnEditable',col_edit,'ColumnWidth',col_width,'RearrangeableColumns','on','Data',default_data);
+% % % % % % % % % % handles.all.names = col_names;
+% % % % % % % % % % handles.all.editable = col_edit;
+% % % % % % % % % % handles.all.data = default_data;
 
 % Initialize Needed Variables
-handles.current.row = 1;
-handles.all.max_od = 0.5; set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
-handles.all.auto_crop = 0; set(handles.Auto_Recrop_Input,'Value',0);
+% % % % % % % % % % handles.current.row = 1;
+% % % % % % % % % % handles.all.max_od = 0.5; set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
+% % % % % % % % % % handles.all.auto_crop = 0; set(handles.Auto_Recrop_Input,'Value',0);
 
 % Choose default command line output for Data_Explorer
 handles.output = hObject;
@@ -111,18 +111,18 @@ function Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles)
 % eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
-if isprop(eventdata,'Indices') && ~isempty(eventdata.Indices) && isfield(handles.all,'filenames')
-    handles.current.row = eventdata.Indices(1);
-    handles.current.class = Current_Image(fullfile(handles.load.folder,handles.all.filenames{handles.current.row}));
-    if isfield(handles,'crop') && isnan(handles.current.class.crop_set(1)) && handles.all.auto_crop, handles.current.class.crop_set = handles.crop.settings; end
-    plot_current_image(handles);
-    guidata(hObject, handles);
-elseif isfield(handles.current,'row') && isfield(handles.all,'filenames')
-    handles.current.class = Current_Image(fullfile(handles.load.folder,handles.all.filenames{handles.current.row}));
-    if isfield(handles,'crop') && isnan(handles.current.class.crop_set(1)) && handles.all.auto_crop, handles.current.class.crop_set = handles.crop.settings; end
-    plot_current_image(handles);
-    guidata(hObject, handles);
-end
+% % % % % % % % % if isprop(eventdata,'Indices') && ~isempty(eventdata.Indices) && isfield(handles.all,'filenames')
+% % % % % % % % %     handles.current.row = eventdata.Indices(1);
+% % % % % % % % %     handles.current.class = Current_Image(fullfile(handles.load.folder,handles.all.filenames{handles.current.row}));
+% % % % % % % % %     if isfield(handles,'crop') && isnan(handles.current.class.crop_set(1)) && handles.all.auto_crop, handles.current.class.crop_set = handles.crop.settings; end
+% % % % % % % % %     plot_current_image(handles);
+% % % % % % % % %     guidata(hObject, handles);
+% % % % % % % % % elseif isfield(handles.current,'row') && isfield(handles.all,'filenames')
+% % % % % % % % %     handles.current.class = Current_Image(fullfile(handles.load.folder,handles.all.filenames{handles.current.row}));
+% % % % % % % % %     if isfield(handles,'crop') && isnan(handles.current.class.crop_set(1)) && handles.all.auto_crop, handles.current.class.crop_set = handles.crop.settings; end
+% % % % % % % % %     plot_current_image(handles);
+% % % % % % % % %     guidata(hObject, handles);
+% % % % % % % % % end
 
 
 % --- Executes when entered data in editable cell(s) in Data_Explorer_Table.
@@ -182,21 +182,21 @@ function Select_Folder_Btn_Callback(hObject, eventdata, handles)
 % hObject    handle to Select_Folder_Btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-t = uigetdir();
-if t(1)>0
-    handles.load.folder = t;
-    set(handles.Select_Folder_Disp,'String',[handles.load.folder]);
-    handles = get_all_fits_files(handles);
-    handles.all.num_added = length(handles.all.filenames);
-    set(handles.Image_Count_Disp,'String',['Images: ',num2str(length(handles.all.filenames)),' Added: ',num2str(handles.all.num_added)]);
-    handles = get_all_name_value(handles);
-    handles =  update_data_explorer_table(handles);
-    handles.current.row = 1;
-    Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles);
-    guidata(hObject, handles);
-    set(handles.Properties_Menu,'Enable','on');
-    set(handles.Rescan_Btn,'Enable','on');
-end
+% % % % % % % % % t = uigetdir();
+% % % % % % % % % if t(1)>0
+% % % % % % % % %     handles.load.folder = t;
+% % % % % % % % %     set(handles.Select_Folder_Disp,'String',[handles.load.folder]);
+% % % % % % % % %     handles = get_all_fits_files(handles);
+% % % % % % % % %     handles.all.num_added = length(handles.all.filenames);
+% % % % % % % % %     set(handles.Image_Count_Disp,'String',['Images: ',num2str(length(handles.all.filenames)),' Added: ',num2str(handles.all.num_added)]);
+% % % % % % % % %     handles = get_all_name_value(handles);
+% % % % % % % % %     handles =  update_data_explorer_table(handles);
+% % % % % % % % %     handles.current.row = 1;
+% % % % % % % % %     Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles);
+% % % % % % % % %     guidata(hObject, handles);
+% % % % % % % % %     set(handles.Properties_Menu,'Enable','on');
+% % % % % % % % %     set(handles.Rescan_Btn,'Enable','on');
+% % % % % % % % % end
 
 
 
@@ -207,19 +207,19 @@ function Rescan_Btn_Callback(hObject, eventdata, handles)
 % hObject    handle to Rescan_Btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-total_files = length(handles.all.filenames);
-handles = get_all_fits_files(handles); 
-handles.all.num_added = length(handles.all.filenames) - total_files;
-set(handles.Image_Count_Disp,'String',['Images: ',num2str(length(handles.all.filenames)),' Added: ',num2str(handles.all.num_added)]);
-handles = get_all_name_value(handles);
-handles =  update_data_explorer_table(handles);
-if handles.all.num_added > 0.1
-    handles.current.row = total_files+1;
-else
-    handles.current.row = handles.current.row;
-end
-Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles);
-guidata(hObject, handles);
+% % % % % % % % % total_files = length(handles.all.filenames);
+% % % % % % % % % handles = get_all_fits_files(handles); 
+% % % % % % % % % handles.all.num_added = length(handles.all.filenames) - total_files;
+% % % % % % % % % set(handles.Image_Count_Disp,'String',['Images: ',num2str(length(handles.all.filenames)),' Added: ',num2str(handles.all.num_added)]);
+% % % % % % % % % handles = get_all_name_value(handles);
+% % % % % % % % % handles =  update_data_explorer_table(handles);
+% % % % % % % % % if handles.all.num_added > 0.1
+% % % % % % % % %     handles.current.row = total_files+1;
+% % % % % % % % % else
+% % % % % % % % %     handles.current.row = handles.current.row;
+% % % % % % % % % end
+% % % % % % % % % Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles);
+% % % % % % % % % guidata(hObject, handles);
 
 
 % --- Executes on button press in Crop_Btn.
@@ -228,23 +228,23 @@ function Crop_Btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% If there are no images selected, then exit the function
-if ~isfield(handles.current,'class'),disp('Minor Error: Please Select an Image Before Cropping!'); return; end
-% If this is the first time using crop, ask user for crop settings.
-if ~isfield(handles,'crop')
-    axes(handles.Cropped_Image_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
-    handles.crop.settings = getrect(handles.Cropped_Image_Axes);
-% Ask user for new crop settings if image's crop setting is same as current
-elseif handles.current.class.crop_set == handles.crop.settings
-    axes(handles.Cropped_Image_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
-    handles.crop.settings = getrect(handles.Cropped_Image_Axes);    
-end
-% Save crop settings
-handles.current.class.crop_set = handles.crop.settings;
-% Update Image
-plot_current_image(handles);
-% Update handles
-guidata(hObject, handles);
+% % % % % % % % % % % If there are no images selected, then exit the function
+% % % % % % % % % % if ~isfield(handles.current,'class'),disp('Minor Error: Please Select an Image Before Cropping!'); return; end
+% % % % % % % % % % % If this is the first time using crop, ask user for crop settings.
+% % % % % % % % % % if ~isfield(handles,'crop')
+% % % % % % % % % %     axes(handles.Cropped_Image_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
+% % % % % % % % % %     handles.crop.settings = getrect(handles.Cropped_Image_Axes);
+% % % % % % % % % % % Ask user for new crop settings if image's crop setting is same as current
+% % % % % % % % % % elseif handles.current.class.crop_set == handles.crop.settings
+% % % % % % % % % %     axes(handles.Cropped_Image_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
+% % % % % % % % % %     handles.crop.settings = getrect(handles.Cropped_Image_Axes);    
+% % % % % % % % % % end
+% % % % % % % % % % % Save crop settings
+% % % % % % % % % % handles.current.class.crop_set = handles.crop.settings;
+% % % % % % % % % % % Update Image
+% % % % % % % % % % plot_current_image(handles);
+% % % % % % % % % % % Update handles
+% % % % % % % % % % guidata(hObject, handles);
 
 
 
@@ -253,11 +253,11 @@ function Max_OD_Input_Callback(hObject, eventdata, handles)
 % hObject    handle to Max_OD_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-input = str2double(get(hObject,'String'));
-if input > 0, handles.all.max_od = input; end
-plot_current_image(handles);
-% Update handles
-guidata(hObject, handles);
+% % % % % % % % % % input = str2double(get(hObject,'String'));
+% % % % % % % % % % if input > 0, handles.all.max_od = input; end
+% % % % % % % % % % plot_current_image(handles);
+% % % % % % % % % % % Update handles
+% % % % % % % % % % guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -278,29 +278,211 @@ function Max_OD_p_Btn_Callback(hObject, eventdata, handles)
 % hObject    handle to Max_OD_p_Btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.all.max_od = handles.all.max_od + 0.1;
-set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
-plot_current_image(handles);
-guidata(hObject, handles);
+% % % % % % % % % % handles.all.max_od = handles.all.max_od + 0.1;
+% % % % % % % % % % set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
+% % % % % % % % % % plot_current_image(handles);
+% % % % % % % % % % guidata(hObject, handles);
 
 % --- Executes on button press in Max_OD_m_Btn.
 function Max_OD_m_Btn_Callback(hObject, eventdata, handles)
 % hObject    handle to Max_OD_m_Btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.all.max_od = handles.all.max_od - 0.1;
-if handles.all.max_od <= 0.0000001, handles.all.max_od = 0.1; end
-set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
-plot_current_image(handles);
-guidata(hObject, handles);
+% % % % % % % % % % handles.all.max_od = handles.all.max_od - 0.1;
+% % % % % % % % % % if handles.all.max_od <= 0.0000001, handles.all.max_od = 0.1; end
+% % % % % % % % % % set(handles.Max_OD_Input,'String',num2str(handles.all.max_od));
+% % % % % % % % % % plot_current_image(handles);
+% % % % % % % % % % guidata(hObject, handles);
 
 % --- Executes on button press in Auto_Recrop_Input.
 function Auto_Recrop_Input_Callback(hObject, eventdata, handles)
 % hObject    handle to Auto_Recrop_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.all.auto_crop = get(hObject,'Value');
-guidata(hObject, handles);
+% % % % % % % % % % handles.all.auto_crop = get(hObject,'Value');
+% % % % % % % % % % guidata(hObject, handles);
+
+
+function Image1_Axes_Number_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Image1_Axes_Number_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Image1_Axes_Number_Input as text
+%        str2double(get(hObject,'String')) returns contents of Image1_Axes_Number_Input as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Image1_Axes_Number_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Image1_Axes_Number_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function Image2_Axes_Number_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Image2_Axes_Number_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Image2_Axes_Number_Input as text
+%        str2double(get(hObject,'String')) returns contents of Image2_Axes_Number_Input as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Image2_Axes_Number_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Image2_Axes_Number_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in Copy_Crop_Btn.
+function Copy_Crop_Btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Copy_Crop_Btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Show_Hidden_Input.
+function Show_Hidden_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Show_Hidden_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of Show_Hidden_Input
+
+
+% --- Executes on button press in Auto_Atom_Number_Input.
+function Auto_Atom_Number_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Auto_Atom_Number_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of Auto_Atom_Number_Input
+
+
+% --- Executes on selection change in Analyzed1_X_Input.
+function Analyzed1_X_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Analyzed1_X_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed1_X_Input contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from Analyzed1_X_Input
+
+
+% --- Executes during object creation, after setting all properties.
+function Analyzed1_X_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Analyzed1_X_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in Analyzed1_Y_Input.
+function Analyzed1_Y_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Analyzed1_Y_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed1_Y_Input contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from Analyzed1_Y_Input
+
+
+% --- Executes during object creation, after setting all properties.
+function Analyzed1_Y_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Analyzed1_Y_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in Analyzed2_X_input.
+function Analyzed2_X_input_Callback(hObject, eventdata, handles)
+% hObject    handle to Analyzed2_X_input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed2_X_input contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from Analyzed2_X_input
+
+
+% --- Executes during object creation, after setting all properties.
+function Analyzed2_X_input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Analyzed2_X_input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in Analyzed2_Y_Input.
+function Analyzed2_Y_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Analyzed2_Y_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed2_Y_Input contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from Analyzed2_Y_Input
+
+
+% --- Executes during object creation, after setting all properties.
+function Analyzed2_Y_Input_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Analyzed2_Y_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+% --- Executes on button press in Condensate_Fraction_Btn.
+function Condensate_Fraction_Btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Condensate_Fraction_Btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -357,6 +539,11 @@ if isfield(handles.current,'class')
     axes(handles.Image1_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
     axes(handles.Image2_Axes); imshow(handles.current.class.raw_data,[0,handles.all.max_od]);
 end
+
+
+
+
+
 
 
 
