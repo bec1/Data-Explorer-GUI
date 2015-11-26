@@ -1,4 +1,4 @@
-classdef Current_Image_2
+classdef Current_Image
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,7 +32,7 @@ end
 
 methods
 %%%%%%%%%%%%%%%%%%%%%%%%%% Constructor %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = Current_Image_2(filepath)
+function obj = Current_Image(filepath)
     % Add path for functions
     root_dir = fileparts(pwd);
     addpath(root_dir);
@@ -71,14 +71,10 @@ function values = get_values(obj,props)
     % Import Matlab File
     t1 = load(obj.analyzed_path,'-mat');
     % Import snippet parameters
-    t2 = GetSnippetValues(obj.filename,props(1,:));
+    [t2,~] = GetSnippetValues(obj.filename,props(1,:)); t2 = t2.value;
     for i = 1:total_props
         if props{2,i} % Snippet file
-            if length(t2)<2
-                values{i} = 'what';
-            else
-                values{i} = t2{i};
-            end
+            values{i} = t2{i};
         else % Matlab File
             if isfield(t1,props{1,i})
                 values{i} = t1.(props{1,i}); 

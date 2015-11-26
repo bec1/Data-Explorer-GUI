@@ -168,9 +168,10 @@ function Properties_Menu_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 outp = Properties_Selector();
 if outp.update
-    handles.all.names = outp.selected_names;
-    handles.all.editable = outp.selected_editable;
-    Rescan_Btn_Callback(hObject,eventdata,handles);
+% % % % % % % %     handles.all.names = outp.selected_names;
+% % % % % % % %     handles.all.editable = outp.selected_editable;
+% % % % % % % %     Rescan_Btn_Callback(hObject,eventdata,handles);
+    handles.dataclass.props = outp.props;
     guidata(hObject, handles);
 end
 

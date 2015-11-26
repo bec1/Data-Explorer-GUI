@@ -53,12 +53,8 @@ function Properties_Selector_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to Properties_Selector (see VARARGIN)
 
 % Get all property Names and Initialize the Table
-handles = get_all_names(handles); 
-all_include = cell(size(handles.all_names));
-for i =1:length(all_include), all_include{i} = false; end
-all_editables = all_include; all_include{1} = true;
-data = [handles.all_names,all_include,all_editables];
-set(handles.Property_Table,'Data',data);
+handles = get_props(handles); 
+set(handles.Property_Table,'Data',handles.props);
 
 % Choose default command line output for Properties_Selector
 handles.output = {'Default'};
@@ -89,21 +85,17 @@ function Close_Btn_Callback(hObject, eventdata, handles)
 % hObject    handle to Close_Btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-all_data = get(handles.Property_Table,'Data');
-selected_names = {}; j=1;
-selected_editable = [];
-for i = 1:size(all_data,1)
-    if all_data{i,2}
-        selected_names{j} = all_data{i,1}; 
-        selected_editable = [selected_editable, all_data{i,3}];
-        j=j+1; 
-    end
+data = get(handles.Property_Table,'Data');
+selected = {}; j=1;
+for i = 1:size(data,1)
+    if data{i,5}, selected(j,1:4) = data(i,1:4); j=j+1; end
 end
-outp.selected_names = selected_names';
-outp.selected_editable = logical(selected_editable);
+handles.props = data;
+outp.props = selected';
 outp.update = 1;
 handles.output = outp;
 guidata(hObject, handles);
+update_props_file(handles);
 uiresume(handles.figure1);
 
 
@@ -126,30 +118,11 @@ function Add_Prop_Btn_Callback(hObject, eventdata, handles)
 % hObject    handle to Add_Prop_Btn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% old_data = get(handles.Property_Table,'Data');
+data = get(handles.Property_Table,'Data');
+handles.props = [data;{'Prop Name',false,50,false,true}];
+set(handles.Property_Table,'Data',handles.props);
+guidata(hObject, handles);
 
-
-
-function Add_Prop_Input_Callback(hObject, eventdata, handles)
-% hObject    handle to Add_Prop_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Add_Prop_Input as text
-%        str2double(get(hObject,'String')) returns contents of Add_Prop_Input as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Add_Prop_Input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Add_Prop_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 
@@ -158,7 +131,43 @@ end
 
 
 % --- USER DEFINED FUNCTION ---
-function handles = get_all_names(handles)
-% Get from Julian's Program, Make sure its column cell
-handles.all_names = {'Filename';'TOF';'RF23';'IRcomp';'Side green evap';'ImagFreq1';'IterationNum';'Spect Time';'Spect Volt'};
+function handles = get_props(handles)
+handles.filepath = fullfile(fileparts(userpath),'Data_Explorer_GUI_Settings_DONOT_DELETE.mat');
+if ~exist(handles.filepath,'file')
+% Settings file doesnt exist
+    props = {...
+        'Hide', 'Notes';...     % column name
+         false, false;...       % true=Snippet, false=.mat 
+            30,   100;...       % Property column Width in pixel
+          true,  true;...       % Property value Editable?
+          true,  true};         % Include Property
+    props = props';
+    save(handles.filepath,'props');
+    handles.props = props;
+else
+% Setting file exists
+    contents = whos('-file',handles.filepath);
+    if ismember('props',{contents.name})
+    % and it contains prop
+        t = load(handles.filepath,'-mat','props');
+        handles.props = t.props;
+    else
+    % But it doenst contain prop
+        props = {...
+            'Hide', 'Notes';...     % column name
+             false, false;...       % true=Snippet, false=.mat 
+                30,   100;...       % Property column Width in pixel
+              true,  true;...       % Property value Editable?
+              true,  true};         % Include Property
+        props = props';
+        save(handles.filepath,'props','-append');
+        handles.props = props;
+    end
+end
 
+
+function update_props_file(handles)
+if exist(handles.filepath,'file')
+    props = handles.props;
+    save(handles.filepath,'props','-append');
+end

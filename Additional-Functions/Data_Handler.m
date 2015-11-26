@@ -11,10 +11,10 @@ properties
     images_path = {}
     images_name = {}
     props = {...
-        'No.','Name','Notes','RF23';... % column name
-         true,  true,  false,  true;... % true=Snippet, false=.mat 
-           20,   100,    100,    30;... % Column Width in pixel
-        false, false,   true, false;}   % Column Editable?
+        'No.','Name', 'Hide', 'Notes','RF23';... % column name
+         true,  true,  false, false,  true;... % true=Snippet, false=.mat 
+           20,   100,     30,   100,    30;... % Column Width in pixel
+        false, false,   true,  true, false;}   % Column Editable?
     all_values = {}
     added_images
     
@@ -36,7 +36,7 @@ function obj = Data_Handler(images_folder_path,processed_root_folder_path)
     obj = setup_processed_data(obj,images_folder_path,processed_root_folder_path);
     
     % Extract list of images and data
-    obj = update_data(obj);
+    obj = update_data(obj,0);
     
 end % Data_Handler
 
@@ -61,7 +61,7 @@ function obj = setup_processed_data(obj,images_folder_path,processed_root_folder
 end % setup_processed_data
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Update Image List %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = update_data(obj)
+function obj = update_data(obj,all)
     % Extract structure with all images
     t = dir(fullfile(obj.images_folder_path,'*.fits'));
     old = length(obj.images_name); new = length(t); added = new - old;
@@ -71,10 +71,11 @@ function obj = update_data(obj)
     new_images_name = cell(new,1); new_images_name(1:old) = obj.images_name(:);
     new_images_path = cell(new,1); new_images_path(1:old) = obj.images_path(:);
     new_values = cell(new,prop_length); new_values(1:old,:) = obj.all_values(:,:);
-    for i = old+1:new
+    start = old+1; if all, start=1; end
+    for i = start:new
         new_images_name{i} = t(i).name; new_images_name{i} = new_images_name{i};
         new_images_path{i} = fullfile(obj.images_folder_path,t(i).name);
-        img_class = Current_Image_2(new_images_path{i});
+        img_class = Current_Image(new_images_path{i});
         new_values(i,1:2) = {num2str(i),new_images_name{i}};
         new_values(i,3:end) = img_class.get_values(obj.props(:,3:end));
     end
@@ -85,6 +86,16 @@ function obj = update_data(obj)
     obj.all_values = flipud(new_values);
     obj.added_images = added;
 end % update_data
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% Getter & Setter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function obj = set.props(obj,props)
+    if size(props,1)==4
+        obj.props = props;
+        obj.update_data(1);
+    end
+end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end % methods
