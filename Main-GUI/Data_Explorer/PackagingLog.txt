@@ -1,19 +1,16 @@
-ant:
-<ant>
-  <mkdir dir="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_redistribution" />
-  <mkdir dir="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing" />
-  <mkdir dir="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_redistribution_files_only" />
-</ant>
 mcc -C -o Data_Explorer -W WinMain:Data_Explorer -T link:exe -d C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing -v C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer.m 
-Compiler version: 6.0 (R2015a)
+Compiler version: 6.1 (R2015b)
+
 Dependency analysis by REQUIREMENTS.
+
 [Warning: Adding path
 "C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI" to Compiler path
 instance.] 
+[] 
 Parsing file "C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer.m"
 	(Referenced from: "Compiler Command Line").
 Deleting 1 temporary MEX authorization files.
-Removing: 'C:\Users\Elder\AppData\Local\Temp\mathworks_tmp_00a2c1010_2604.auth'.
+Removing: 'C:\Users\Elder\AppData\Local\Temp\mathworks_tmp_01ffc9020_8188.auth'.
 Generating file "C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing\readme.txt".
 Packaging...
 Adding custom icon C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer_resources\icon.ico to C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing\Data_Explorer.exe.
@@ -22,4 +19,4 @@ Finished embedding CTF archive. Deleting the external CTF archive.
 Creating the bundle...
 Web based installer created at C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_redistribution\MyAppInstaller_web.exe.
 Packaging complete.
-Elapsed packaging time was: 3 minutes and 48 seconds.
+Elapsed packaging time was: 43 seconds.

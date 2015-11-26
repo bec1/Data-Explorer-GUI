@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="2862846246" file="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer.prj" location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI" name="Data_Explorer" preferred-package-location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="1350791043" file="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer.prj" location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI" name="Data_Explorer" preferred-package-location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>Data_Explorer</param.appname>
     <param.icon>${PROJECT_ROOT}\Data_Explorer_resources\icon.ico</param.icon>
     <param.icons>
@@ -8,19 +8,19 @@
       <file>${PROJECT_ROOT}\Data_Explorer_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\Data_Explorer_resources\icon_16.png</file>
     </param.icons>
-    <param.version>1.0</param.version>
+    <param.version>1.1</param.version>
     <param.authnamewatermark>Parth Patel</param.authnamewatermark>
     <param.email>pbpatel@mit.edu</param.email>
     <param.company>MIT</param.company>
-    <param.summary>Self explanetory</param.summary>
-    <param.description>Self explanetory</param.description>
+    <param.summary>view images</param.summary>
+    <param.description>like a bouss!</param.description>
     <param.screenshot>C:\Users\Elder\Pictures\WaveMetrics_IGOR_Pro_Logo.png</param.screenshot>
     <param.guid />
-    <param.net.saved.interface />
     <param.installpath.string>\MIT\Data_Explorer\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
     <param.logo />
     <param.install.notes />
+    <param.target.install.notes />
     <param.intermediate>${PROJECT_ROOT}\Data_Explorer\for_testing</param.intermediate>
     <param.files.only>${PROJECT_ROOT}\Data_Explorer\for_redistribution_files_only</param.files.only>
     <param.output>${PROJECT_ROOT}\Data_Explorer\for_redistribution</param.output>
@@ -44,12 +44,11 @@
     <param.create.log>false</param.create.log>
     <param.log.file />
     <unset>
-      <param.version />
       <param.guid />
-      <param.net.saved.interface />
       <param.installpath.string />
       <param.installpath.combo />
       <param.logo />
+      <param.target.install.notes />
       <param.intermediate />
       <param.files.only />
       <param.output />
@@ -71,7 +70,9 @@
     <fileset.main>
       <file>${PROJECT_ROOT}\Data_Explorer.m</file>
     </fileset.main>
-    <fileset.resources>
+    <fileset.resources />
+    <fileset.package />
+    <fileset.depfun>
       <file>${MATLAB_ROOT}\toolbox\local\userpath.m</file>
       <file>C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Additional-Functions\Current_Image.m</file>
       <file>C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Additional-Functions\load_img.m</file>
@@ -82,8 +83,7 @@
       <file>C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Snippet-Functions\GetSnippetValues.m</file>
       <file>C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Snippet-Functions\MatchSnippetLine.m</file>
       <file>C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Snippet-Functions\ReadSnippetFile.m</file>
-    </fileset.resources>
-    <fileset.package />
+    </fileset.depfun>
     <build-deliverables>
       <file location="${PROJECT_ROOT}\Data_Explorer\for_testing" name="Data_Explorer.exe" optional="false">C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing\Data_Explorer.exe</file>
       <file location="${PROJECT_ROOT}\Data_Explorer\for_testing" name="readme.txt" optional="true">C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing\readme.txt</file>
@@ -91,7 +91,7 @@
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2015a</root>
+      <root>C:\Program Files\MATLAB\R2015b</root>
       <toolboxes>
         <toolbox name="matlabhdlcoder" />
         <toolbox name="fixedpoint" />
