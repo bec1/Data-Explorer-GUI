@@ -86,8 +86,9 @@ function Close_Btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 data = get(handles.Property_Table,'Data');
-selected = {}; j=1;
-for i = 1:size(data,1)
+selected = {};
+selected(1:2,1:4) = data(1:2,1:4); j=3;
+for i = 3:size(data,1)
     if data{i,5}, selected(j,1:4) = data(i,1:4); j=j+1; end
 end
 handles.props = data;
@@ -167,11 +168,11 @@ handles.filepath = fullfile(fileparts(userpath),'Data_Explorer_GUI_Settings_DONO
 if ~exist(handles.filepath,'file')
 % Settings file doesnt exist
     props = {...
-        'Hide', 'Notes';...     % column name
-         false, false;...       % true=Snippet, false=.mat 
-            30,   100;...       % Property column Width in pixel
-          true,  true;...       % Property value Editable?
-          true,  true};         % Include Property
+        'no.','name', 'hide', 'notes','RF23';... % column name
+        false, false,  false, false,  true;...   % true=Snippet, false=.mat 
+           30,   150,     30,   100,    50;...   % Column Width in pixel
+        false, false,   true,  true, false;...   % Column Editable?
+         true,  true,   true,  true,  true};     % Include Property
     props = props';
     save(handles.filepath,'props');
     handles.props = props;
@@ -185,11 +186,11 @@ else
     else
     % But it doenst contain prop
         props = {...
-            'Hide', 'Notes';...     % column name
-             false, false;...       % true=Snippet, false=.mat 
-                30,   100;...       % Property column Width in pixel
-              true,  true;...       % Property value Editable?
-              true,  true};         % Include Property
+            'no.','name', 'hide', 'notes','RF23';... % column name
+            false, false,  false, false,  true;...   % true=Snippet, false=.mat 
+               30,   150,     30,   100,    50;...   % Column Width in pixel
+            false, false,   true,  true, false;...   % Column Editable?
+             true,  true,   true,  true,  true};     % Include Property
         props = props';
         save(handles.filepath,'props','-append');
         handles.props = props;

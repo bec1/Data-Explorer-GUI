@@ -161,7 +161,7 @@ function Properties_Menu_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 outp = Properties_Selector();
 if outp.update
-    handles.all.props = outp.props;
+    handles.
     handles.dataclass.props = outp.props;
     update_data_table(handles.Data_Explorer_Table,handles.dataclass.props,handles.dataclass.all_values);
     guidata(hObject, handles);
@@ -177,7 +177,6 @@ function Select_Folder_Btn_Callback(hObject, eventdata, handles)
 
 % Needed variables
 inputs = handles.inputs;
-if isfield(handles,'all') && isfield(handles.all,'props'), inputs.props = handles.all.props; end
 
 % Prompt user for a directory.
 images_folder_path = uigetdir(fileparts(userpath));

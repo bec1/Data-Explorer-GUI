@@ -12,6 +12,7 @@ properties
     fileext
     analyzed_dir
     analyzed_path
+    snippet_folder_path
     
     % Get using getters
     raw_data
@@ -36,15 +37,16 @@ end
 
 methods
 %%%%%%%%%%%%%%%%%%%%%%%%%% Constructor %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = Current_Image(filepath)
+function obj = Current_Image(filepath,inputs)
     % Add path for functions
     root_dir = fileparts(pwd);
     addpath(root_dir);
     addpath(fullfile(root_dir,'Snippet-Functions'));
 
     % Continue only if filepath is provided and exists.            
-    if nargin==1 && exist(filepath,'file')
+    if exist(filepath,'file')
         obj.filepath = filepath;
+        obj.snippet_folder_path = inputs.snippet_folder_path;
         [pathstr,obj.filename,obj.fileext] = fileparts(filepath);
         [pathstr,name,~] = fileparts(pathstr);
         obj.analyzed_dir = fullfile(pathstr,[name,'-Analyzed']);
@@ -75,15 +77,21 @@ function values = get_values(obj,props)
     % Import Matlab File
     t1 = load(obj.analyzed_path,'-mat');
     % Import snippet parameters
-    [t2,~] = GetSnippetValues(obj.filename,props(1,:)); t2 = t2.value;
+    [t2,~] = GetSnippetValues(obj.filename,props(1,:),'SnippetFolder',obj.snippet_folder_path); t2 = t2.value;
     for i = 1:total_props
-        if props{2,i} % Snippet file
+        if strcmp(props{1,i},'hide')
+            if isfield(t1,'hide')
+                values{i} = t1.hide; 
+            else
+                values{i} = false;
+            end
+        elseif props{2,i} % Snippet file
             values{i} = t2{i};
         else % Matlab File
             if isfield(t1,props{1,i})
                 values{i} = t1.(props{1,i}); 
             else
-                values{i} = '-';
+                values{i} = '';
             end
         end
     end

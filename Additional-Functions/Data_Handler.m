@@ -9,14 +9,16 @@ properties
     % Initialized by Constructor
     images_folder_path
     processed_file_path
+    snippet_folder_path
     images_path = {}
     images_name = {}
     props = {...
-        'No.','Name', 'Hide', 'Notes','RF23';... % column name
+        'no.','name', 'hide', 'notes','RF23';... % column name
          true,  true,  false, false,  true;... % true=Snippet, false=.mat 
-           20,   100,     30,   100,    30;... % Column Width in pixel
-        false, false,   true,  true, false;}   % Column Editable?
+           30,   150,     30,   100,    50;... % Column Width in pixel
+        false, false,   true,  true, false}   % Column Editable?
     all_values = {}
+    total_images
     added_images
     
 end % properties
@@ -30,14 +32,16 @@ end % properties
 methods
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Constructor %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = Data_Handler(images_folder_path,processed_root_folder_path)
+function obj = Data_Handler(images_folder_path,inputs)
     if nargin ~= 2 || ~exist(images_folder_path,'dir'), error('FATAL ERROR: Incorrect folder name or inputs'); end
     
     obj.images_folder_path = images_folder_path;
-    obj = setup_processed_data(obj,images_folder_path,processed_root_folder_path);
+    obj = setup_processed_data(obj,images_folder_path,inputs.processed_root_folder_path);
+    obj.snippet_folder_path = inputs.snippet_folder_path;
+    if isfield(inputs,'props'), obj.props = inputs.props; end
     
     % Extract list of images and data
-    obj = update_data(obj,0);
+    obj = update_data(obj,1);
     
 end % Data_Handler
 
@@ -48,7 +52,7 @@ end % Data_Handler
 function obj = setup_processed_data(obj,images_folder_path,processed_root_folder_path)
     % Extract names/paths
     [~,images_folder_name,~] = fileparts(images_folder_path);
-    data_date = datetime(images_folder_name);
+    data_date = datetime(images_folder_name(1:10));
     processed_folder_path = fullfile(processed_root_folder_path,datestr(data_date,'yyyy'),datestr(data_date,'yyyy-mm'),datestr(data_date,'yyyy-mm-dd'));
     processed_file_name = [images_folder_name,'-DataExplorer.mat'];
     obj.processed_file_path = fullfile(processed_folder_path,processed_file_name);
@@ -56,6 +60,8 @@ function obj = setup_processed_data(obj,images_folder_path,processed_root_folder
     [~,~,~] = mkdir(processed_folder_path); % This command will NOT overwirte existing files there
     if ~exist(obj.processed_file_path,'file')
         save(obj.processed_file_path,'images_folder_path');
+    else
+        save(obj.processed_file_path,'images_folder_path','-append');
     end
     
     
@@ -65,18 +71,25 @@ end % setup_processed_data
 function obj = update_data(obj,all)
     % Extract structure with all images
     t = dir(fullfile(obj.images_folder_path,'*.fits'));
-    old = length(obj.images_name); new = length(t); added = new - old;
     prop_length = size(obj.props); prop_length = prop_length(2);
+   
+    if all
+        old = 0; new = length(t); added = new - old; start = old+1;
+        new_images_name = cell(new,1);
+        new_images_path = cell(new,1);
+        new_values = cell(new,prop_length);
+    else
+        old = length(obj.images_name); new = length(t); added = new - old; start = old+1;
+        new_images_name = cell(new,1); new_images_name(1:old) = obj.images_name(:);
+        new_images_path = cell(new,1); new_images_path(1:old) = obj.images_path(:);
+        new_values = cell(new,prop_length); new_values(1:old,:) = obj.all_values(:,:);
+    end
     
-    % Extract image names, paths and name/value
-    new_images_name = cell(new,1); new_images_name(1:old) = obj.images_name(:);
-    new_images_path = cell(new,1); new_images_path(1:old) = obj.images_path(:);
-    new_values = cell(new,prop_length); new_values(1:old,:) = obj.all_values(:,:);
-    start = old+1; if all, start=1; end
     for i = start:new
         new_images_name{i} = t(i).name; new_images_name{i} = new_images_name{i};
         new_images_path{i} = fullfile(obj.images_folder_path,t(i).name);
-        img_class = Current_Image(new_images_path{i});
+        inputs.snippet_folder_path = obj.snippet_folder_path;
+        img_class = Current_Image(new_images_path{i},inputs);
         new_values(i,1:2) = {num2str(i),new_images_name{i}};
         new_values(i,3:end) = img_class.get_values(obj.props(:,3:end));
     end
@@ -101,10 +114,12 @@ end % extract all values
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% Getter & Setter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function total_images = get.total_images(obj), total_images = length(obj.total_images); end
+
 function obj = set.props(obj,props)
     if size(props,1)==4
         obj.props = props;
-        obj.update_data(1);
+        obj = obj.update_data(1);
     end
 end
 
