@@ -19,7 +19,7 @@ properties
     snipfolder
     
     % Data
-    alldata = {}
+    alldata = struct();
     
     % Mode
     mode = 0 % 0-read only,  1-write,  2-refresh, reload from snippet
@@ -43,8 +43,8 @@ function obj = Data_Handler(inputs)
     obj.mode       = inputs.mode;
     
     % setup data file
-    obj = setup_data(obj);
-    
+    obj = obj.setup_data;
+    obj = obj.folder_scan;
     
     
     % Temporary
@@ -55,8 +55,24 @@ function obj = Data_Handler(inputs)
 end % Data_Handler
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% process images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = process_images(obj,ims)
-    
+function obj = process_images(obj,imnum)
+    % Loop through all ims
+    for i = imnum
+        if ~isfield(obj.alldata,obj.imvars{i})
+            % Setup must have default parameters
+            im = struct();
+            im.name = obj.imnames{i};
+            im.hide = false;
+            im.notes = '';
+            
+            % Extract all data from snippet
+            snip = GetSnippetValues(im.name, 'SnippetFolder', obj.snipfolder);
+            for j = 1:length(snip.parameter), im.(matlab.lang.makeValidName(snip.parameter{j})) = snip.values{j}; end
+            
+            % Add all nave value pair to all data
+            obj.alldata.(obj.imvars{i}) = im;
+        end
+    end
 end % process_images
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% folder scan %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,15 +102,16 @@ function obj = folder_scan(obj)
     
     % Process the images depending of the case
     if obj.mode==2 || old==0                         % Refresh or first time -- process all images
-        obj = obj.process_images(obj.imnames);
+        obj = obj.process_images(1:new);
     elseif strcmp(obj.imnames{added+1},oldim1)  % Check that new images are added on top
-        obj = obj.process_images(obj.imnames(1:added));
+        obj = obj.process_images(1:added);
     else                                             % Not sure what happened, process all
-        obj = obj.process_images(obj.imnames);
+        obj = obj.process_images(1:new);
     end
     
     % Store Data
-    save(obj.datafile,'-struct','obj','alldata','-append');
+    alldata = obj.alldata;
+    save(obj.datafile,'alldata','-append');
     
 end % folder_scan
 
@@ -132,18 +149,19 @@ end % imrow
 % generate processed data folder -- create .mat file -- if it exists,
 % import data from it and save it to obj
 function obj = setup_data(obj)
+    % Generate data file name and path
     [~,imfolder_name,~] = fileparts(obj.imfolder);
     data_date = datetime(imfolder_name(1:10));
     processed_folder_path = fullfile(obj.datafile,datestr(data_date,'yyyy'),datestr(data_date,'yyyy-mm'),datestr(data_date,'yyyy-mm-dd'));
-    processed_file_name = [imfolder_name,'-DataExplorer.mat'];
-    obj.datafile = fullfile(processed_folder_path,processed_file_name);
-    % Create Matlab storage files
-    image_folder = obj.imfolder;
-    [~,~,~] = mkdir(processed_folder_path); % This command will NOT overwirte existing files there
-    if ~exist(obj.datafile,'file'), save(obj.datafile,'image_folder');
-    else save(obj.datafile,'-struct','image_folder','-append'); end
-    % If data exists, then import it
+    obj.datafile = fullfile(processed_folder_path,[imfolder_name,'-DataExplorer.mat']);
     
+    % Create data file if it doesn't exist. If it does, extract data from it.
+    [~,~,~] = mkdir(processed_folder_path); % This command will NOT overwirte existing files there
+    if ~exist(obj.datafile,'file'), save(obj.datafile,'imfolder_name');
+    else
+        contents = load(obj.datafile,'-mat');
+        if isfield(contents,'alldata'), obj.alldata = contents.alldata; end
+    end
     
 end % setup_data
 
