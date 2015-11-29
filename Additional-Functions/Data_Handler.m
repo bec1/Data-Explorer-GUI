@@ -47,10 +47,10 @@ function obj = Data_Handler(inputs)
     obj = obj.folder_scan;
     
     
-    % Temporary
-    addpath('/Users/RanchoP/Documents/Data-Explorer-GUI/Additional-Functions');
-    addpath('/Users/RanchoP/Documents/Data-Explorer-GUI/Additional-GUIs');
-    addpath('/Users/RanchoP/Documents/Data-Explorer-GUI/Snippet-Functions');
+%     % Temporary
+%     addpath('/Users/RanchoP/Documents/Data-Explorer-GUI/Additional-Functions');
+%     addpath('/Users/RanchoP/Documents/Data-Explorer-GUI/Additional-GUIs');
+%     addpath('/Users/RanchoP/Documents/Data-Explorer-GUI/Snippet-Functions');
     
 end % Data_Handler
 
@@ -58,7 +58,7 @@ end % Data_Handler
 function obj = process_images(obj,imnum)
     % Loop through all ims
     for i = imnum
-        if ~isfield(obj.alldata,obj.imvars{i})
+        if ~isfield(obj.alldata,obj.imvars{i}) || obj.mode==2
             % Setup must have default parameters
             im = struct();
             im.name = obj.imnames{i};
@@ -67,7 +67,7 @@ function obj = process_images(obj,imnum)
             
             % Extract all data from snippet
             snip = GetSnippetValues(im.name, 'SnippetFolder', obj.snipfolder);
-            for j = 1:length(snip.parameter), im.(matlab.lang.makeValidName(snip.parameter{j})) = snip.values{j}; end
+            for j = 1:length(snip.parameter), im.(matlab.lang.makeValidName(snip.parameter{j})) = snip.value{j}; end
             
             % Add all nave value pair to all data
             obj.alldata.(obj.imvars{i}) = im;
@@ -78,18 +78,18 @@ end % process_images
 %%%%%%%%%%%%%%%%%%%%%%%%%% folder scan %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function obj = folder_scan(obj)
     % Old information that might be needed
-    oldim1 = obj.imnames{1};
+    oldim = obj.imnames;
     
     % Extract list of all files
     listing = dir(fullfile(obj.imfolder,'*.fits'));
     obj.imnames = cellfun( @(x) x(1:end-5), {listing(:).name}', 'UniformOutput', false);
     obj.impaths = cellfun( @(x) fullfile(obj.imfolder,x), {listing(:).name}', 'UniformOutput', false);
-    obj.imtimes = cellfun( @(x) datenum(x), obj.imnames, 'UniformOutput', false);
+    obj.imtimes = cellfun( @(x) datenum(x,'mm-dd-yyyy_HH_MM_SS'), obj.imnames, 'UniformOutput', false);
     obj.imvars  = matlab.lang.makeValidName(obj.imnames);
     obj.imtotal = length(obj.imnames);
     
     % Order images, newest time first
-    [~,I] = sort(obj.imtimes,'descend');
+    [~,I] = sort([obj.imtimes{:}],'descend');
     obj.imnames = obj.imnames(I);
     obj.impaths = obj.impaths(I);
     obj.imtimes = obj.imtimes(I);
@@ -103,7 +103,7 @@ function obj = folder_scan(obj)
     % Process the images depending of the case
     if obj.mode==2 || old==0                         % Refresh or first time -- process all images
         obj = obj.process_images(1:new);
-    elseif strcmp(obj.imnames{added+1},oldim1)  % Check that new images are added on top
+    elseif strcmp(obj.imnames{added+1},oldim)  % Check that new images are added on top
         obj = obj.process_images(1:added);
     else                                             % Not sure what happened, process all
         obj = obj.process_images(1:new);
@@ -162,7 +162,6 @@ function obj = setup_data(obj)
         contents = load(obj.datafile,'-mat');
         if isfield(contents,'alldata'), obj.alldata = contents.alldata; end
     end
-    
 end % setup_data
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
