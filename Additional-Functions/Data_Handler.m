@@ -11,6 +11,7 @@ properties
     impaths = {}
     imtimes = {}
     imvars  = {}
+    imnums = []
     imtotal = 0
     
     % Folders
@@ -42,6 +43,14 @@ function obj = Data_Handler(inputs)
     obj.snipfolder = inputs.snipfolder;
     obj.mode       = inputs.mode;
     
+    % Make sure paths to all the functions are in the search list
+    root_dir = fileparts(pwd);
+    addpath(root_dir);
+    addpath(fullfile(root_dir,'Additional-Functions'));
+    addpath(fullfile(root_dir,'Snippet-Functions'));
+    addpath(fullfile(root_dir,'Additional-GUIs'));
+    addpath(fullfile(root_dir,'Main-GUI'));
+    
     % setup data file
     obj = obj.setup_data;
     obj = obj.folder_scan;
@@ -64,6 +73,7 @@ function obj = process_images(obj,imnum)
             im.name = obj.imnames{i};
             im.hide = false;
             im.notes = '';
+            im.num = obj.imnums(i);
             
             % Extract all data from snippet
             snip = GetSnippetValues(im.name, 'SnippetFolder', obj.snipfolder);
@@ -94,6 +104,7 @@ function obj = folder_scan(obj)
     obj.impaths = obj.impaths(I);
     obj.imtimes = obj.imtimes(I);
     obj.imvars  = obj.imvars(I);
+    obj.imnums  = (obj.imtotal:-1:1)';
     
     % Check how many new images are added
     new = length(obj.imnames);
@@ -112,38 +123,85 @@ function obj = folder_scan(obj)
     % Store Data
     alldata = obj.alldata;
     save(obj.datafile,'alldata','-append');
-    
 end % folder_scan
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% getdata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = getdata(obj)
-
+function vals = getdata(obj,imnum,pnames)
+    % Prepare
+    pnames = matlab.lang.makeValidName(pnames);
+    vals = cell(size(pnames));
+    
+    % Extract all values for the image
+    allvals = obj.alldata.(obj.imvars{imnum});
+    
+    % Extract vals for pnames
+    for i = 1:length(pnames)
+        if isfield(allvals,pnames{i}), vals{i} = allvals.(pnames{i});
+        else vals{i} = 'NaN'; end
+    end
 end % getdata
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% savedata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = savedata(obj)
-
+function obj = savedata(obj,imnum,pnames,vals)
+    % Prepare
+    overwritten = 0;
+    pnames = matlab.lang.makeValidName(pnames);
+    
+    % Add all name/value pairs
+    for i = 1:length(pnames)
+        if isfield(obj.alldata.(obj.imvars{imnum}),pnames{i}), overwritten = 1; end
+        obj.alldata.(obj.imvars{imnum}).(pnames{i}) = vals{i};
+    end
+    
+    % Save all data
+    alldata = obj.alldata;
+    save(obj.datafile,'alldata','-append');
 end % savedata
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% celldata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = celldata(obj)
-
+% hidden = true --> Only output visible images
+function data = celldata(obj, pnames, hidden)
+    % Prepare
+    pnames = matlab.lang.makeValidName(pnames);
+    plength = length(pnames);
+    data = cell(obj.imtotal,plength);
+    counter = 0;
+    
+    % Extract name/value for all images
+    for i = 1:obj.imtotal
+    if ~hidden || ~obj.alldata.(obj.imvars{i}).hide
+        counter = counter + 1;
+        allvals = obj.alldata.(obj.imvars{i});
+        for j = 1:plength
+            if isfield(allvals,pnames{j}), data{counter,j} = allvals.(pnames{j}); 
+            else data{counter,j} = 'NaN'; end
+        end
+    end
+    end
+    
+    % Resize data
+    data = data(1:counter,:);
 end % celldata
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% imdata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = imdata(obj)
-
+function data = imdata(obj,imnum)
+    data = load_img(obj.impaths{imnum});
 end % imdata
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% refresh %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = refresh(obj)
-
-end % refresh
+% Refreshed all data from snippet file ONLY if the mode was not read only
+% function obj = refresh(obj)
+%     if obj.mode ~= 0
+%         obj.mode = 2;
+%         obj = obj.folder_scan;
+%         obj.mode = 1;
+%     end
+% end % refresh
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% imrow %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function obj = imrow(obj)
-
-end % imrow
+% function row = imrow(obj, imname)
+%     row = 1;
+% end % imrow
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% setup_data %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % generate processed data folder -- create .mat file -- if it exists,
