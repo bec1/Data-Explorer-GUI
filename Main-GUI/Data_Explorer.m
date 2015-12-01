@@ -22,7 +22,7 @@ function varargout = Data_Explorer(varargin)
 
 % Edit the above text to modify the response to help Data_Explorer
 
-% Last Modified by GUIDE v2.5 30-Nov-2015 20:11:19
+% Last Modified by GUIDE v2.5 30-Nov-2015 22:32:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,10 +81,10 @@ set(handles.Refresh_Btn,'Enable','off');
 handles.data.OD = 0.5;
 handles.data.cropset = [];
 handles.data.mode = 1;
-handles.data.props = {'no.','name','hide','notes','RF23','Spect Time','Spect Volt','TOF';...
-                      false, false, false,  false,  true,        true,        true, true;...
-                         30,   150,    30,    100,    50,          50,          50,   30;...
-                      false, false,  true,   true, false,       false,       false,false};
+handles.data.props.pnames = {'num','name','hide','notes','TOF'};
+handles.data.props.widths = {30,150,30,100,50};
+handles.data.props.editables = {false,false,true,true,false};
+handles.data.current = 0;
 
 % Choose default command line output for Data_Explorer
 handles.output = hObject;
@@ -122,7 +122,8 @@ function Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles)
 % eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
-
+% if isprop(eventdata,'Indices') && ~isempty(eventdata.Indices) && isfield(handles,'dataclass')
+%     imgdat = handles.dataclass
 
 
 % --- Executes when entered data in editable cell(s) in Data_Explorer_Table.
@@ -135,6 +136,18 @@ function Data_Explorer_Table_CellEditCallback(hObject, eventdata, handles)
 %	NewData: EditData or its converted form set on the Data property. Empty if Data was not changed
 %	Error: error string when failed to convert EditData to appropriate value for Data
 % handles    structure with handles and user data (see GUIDATA)
+
+% Extract editted data
+hidden = get(handles.Show_Hidden_Input,'Value');
+imnum = eventdata.Indices(1);
+if hidden, imnum = handles.data.imnumshidden(imnum); end
+pname = get(handles.Data_Explorer_Table,'ColumnName');
+pname = pname(eventdata.Indices(2));
+val = {eventdata.NewData};
+
+% Update data
+handles.dataclass = handles.dataclass.savedata(imnum, pname, val);
+guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -168,8 +181,10 @@ function Properties_Menu_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 outp = Properties_Selector();
 if outp.update
-    handles.data.props = outp.props;
-    update_data_table(handles);
+    handles.data.props.pnames = outp.pnames;
+    handles.data.props.widths = outp.widths;
+    handles.data.props.editables = outp.editables;
+    handles = update_data_table(handles);
     guidata(hObject, handles);
 end
 
@@ -194,7 +209,7 @@ if images_folder_path ~= 0
     % Update all the GUI objects
     set(handles.Select_Folder_Disp,'String',[images_folder_path]);
     set(handles.Image_Count_Disp,'String',['Images: ',num2str(handles.dataclass.imtotal),' Added: ',num2str(handles.dataclass.imadded)]);
-    update_data_table(handles);
+    handles = update_data_table(handles);
     set(handles.Properties_Menu,'Enable','on');
     set(handles.Refresh_Btn,'Enable','on');
 end
@@ -319,9 +334,11 @@ function Show_Hidden_Input_Callback(hObject, eventdata, handles)
 % hObject    handle to Show_Hidden_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 % Hint: get(hObject,'Value') returns toggle state of Show_Hidden_Input
+handles = update_data_table(handles);
 
+% Update GUI data
+guidata(hObject, handles);
 
 % --- Executes on button press in Auto_Atom_Number_Input.
 function Auto_Atom_Number_Input_Callback(hObject, eventdata, handles)
@@ -448,27 +465,32 @@ function Condensate_Fraction_Btn_Callback(hObject, eventdata, handles)
 
 
 
-
-
 % --- USER DEFINED FUNCTION ---
-function update_data_table(handles)
+function handles = update_data_table(handles)
 % Extract data from handles
 table = handles.Data_Explorer_Table;
-props = handles.data.props;
+pnames = handles.data.props.pnames;
+widths = handles.data.props.widths;
+editables = handles.data.props.editables;
 hidden = logical(get(handles.Show_Hidden_Input,'Value'));
 
 
 % Prepare data
-data = handles.dataclass.celldata(props,hidden);
-editables = zeros(1,size(props,2));
-for i=1:size(props,2), editables(i) = props{4,i}; end
-editables = logical(editables);
+[data, imnumshidden] = handles.dataclass.celldata(pnames,hidden);
+editables2 = zeros(1,length(editables));
+for i=1:length(editables), editables2(i) = editables{i}; end
+editables2 = logical(editables2);
 
 % Update Data_Table
-set(table,'ColumnName',props(1,:),...
-    'ColumnWidth',props(3,:),...
-    'ColumnEditable',editables,...
+set(table,'ColumnName',pnames,...
+    'ColumnWidth',widths,...
+    'ColumnEditable',editables2,...
     'Data',data);
+
+% Update Handles
+handles.data.celldata = data;
+handles.data.imnumshidden = imnumshidden;
+
 
 
 

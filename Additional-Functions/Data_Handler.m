@@ -74,7 +74,6 @@ function obj = process_images(obj,imnum)
             im.name = obj.imnames{i};
             im.hide = false;
             im.notes = '';
-            im.num = obj.imnums(i);
             
             % Extract all data from snippet
             snip = GetSnippetValues(im.name, 'SnippetFolder', obj.snipfolder);
@@ -168,11 +167,12 @@ end % savedata
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% celldata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % hidden = true --> Only output visible images
-function data = celldata(obj, pnames, hidden)
+function [data, imnumshidden] = celldata(obj, pnames, hidden)
     % Prepare
     pnames = matlab.lang.makeValidName(pnames);
     plength = length(pnames);
     data = cell(obj.imtotal,plength);
+    imnumshidden = zeros(obj.imtotal,1);
     counter = 0;
     
     % Extract name/value for all images
@@ -180,15 +180,19 @@ function data = celldata(obj, pnames, hidden)
     if ~hidden || ~obj.alldata.(obj.imvars{i}).hide
         counter = counter + 1;
         allvals = obj.alldata.(obj.imvars{i});
+        imnumshidden(counter) = i;
         for j = 1:plength
-            if isfield(allvals,pnames{j}), data{counter,j} = allvals.(pnames{j}); 
-            else data{counter,j} = 'NaN'; end
+            if strcmp(pnames{j},'num'), data{counter,j} = obj.imnums(i);
+            elseif isfield(allvals,pnames{j}), data{counter,j} = allvals.(pnames{j}); 
+            else data{counter,j} = 'NaN'; 
+            end
         end
     end
     end
     
     % Resize data
     data = data(1:counter,:);
+    imnumshidden = imnumshidden(1:counter);
 end % celldata
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% imdata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
