@@ -11,8 +11,9 @@ properties
     impaths = {}
     imtimes = {}
     imvars  = {}
-    imnums = []
+    imnums  = []
     imtotal = 0
+    imadded = 0
     
     % Folders
     imfolder
@@ -114,15 +115,20 @@ function obj = folder_scan(obj)
     % Process the images depending of the case
     if obj.mode==2 || old==0                         % Refresh or first time -- process all images
         obj = obj.process_images(1:new);
+        obj.imadded = new;
     elseif strcmp(obj.imnames{added+1},oldim)  % Check that new images are added on top
         obj = obj.process_images(1:added);
+        obj.imadded = added;
     else                                             % Not sure what happened, process all
         obj = obj.process_images(1:new);
+        obj.imadded = new;
     end
     
     % Store Data
-    alldata = obj.alldata;
-    save(obj.datafile,'alldata','-append');
+    if obj.mode ~= 0
+        alldata = obj.alldata;
+        save(obj.datafile,'alldata','-append');
+    end
 end % folder_scan
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% getdata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,9 +159,11 @@ function obj = savedata(obj,imnum,pnames,vals)
         obj.alldata.(obj.imvars{imnum}).(pnames{i}) = vals{i};
     end
     
-    % Save all data
-    alldata = obj.alldata;
-    save(obj.datafile,'alldata','-append');
+    % Store Data
+    if obj.mode ~= 0
+        alldata = obj.alldata;
+        save(obj.datafile,'alldata','-append');
+    end
 end % savedata
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% celldata %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -215,7 +223,8 @@ function obj = setup_data(obj)
     
     % Create data file if it doesn't exist. If it does, extract data from it.
     [~,~,~] = mkdir(processed_folder_path); % This command will NOT overwirte existing files there
-    if ~exist(obj.datafile,'file'), save(obj.datafile,'imfolder_name');
+    if ~exist(obj.datafile,'file')
+        save(obj.datafile,'imfolder_name');
     else
         contents = load(obj.datafile,'-mat');
         if isfield(contents,'alldata'), obj.alldata = contents.alldata; end

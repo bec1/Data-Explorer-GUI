@@ -78,13 +78,7 @@ set(handles.Properties_Menu,'Enable','off');
 set(handles.Refresh_Btn,'Enable','off');
 
 % Initialize Needed Variables
-handles.data.OD = 0.5;
-handles.data.cropset = [];
-handles.data.mode = 1;
-handles.data.props = {'no.','name','hide','notes','RF23','Spect Time','Spect Volt','TOF';...
-                      false, false, false,  false,  true,        true,        true, true;...
-                         30,   150,    30,    100,    50,          50,          50,   30;...
-                      false, false,  true,   true, false,       false,       false,false};
+handles.
 
 % Choose default command line output for Data_Explorer
 handles.output = hObject;
@@ -188,7 +182,6 @@ images_folder_path = uigetdir(fileparts(userpath));
 if images_folder_path ~= 0
     % Create data_handler class using provided folder
     handles.file.inputs.imfolder = images_folder_path;
-    handles.file.inputs.mode = handles.data.mode;
     handles.dataclass = Data_Handler(handles.file.inputs);
     
     % Update all the GUI objects
