@@ -22,7 +22,7 @@ function varargout = Data_Explorer(varargin)
 
 % Edit the above text to modify the response to help Data_Explorer
 
-% Last Modified by GUIDE v2.5 30-Nov-2015 22:32:48
+% Last Modified by GUIDE v2.5 01-Dec-2015 21:17:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -85,6 +85,7 @@ handles.data.props.pnames = {'num','name','hide','notes','TOF'};
 handles.data.props.widths = {30,150,30,100,50};
 handles.data.props.editables = {false,false,true,true,false};
 handles.data.current = 0;
+handles.data.auto_update = 0;
 
 % Choose default command line output for Data_Explorer
 handles.output = hObject;
@@ -109,21 +110,19 @@ function varargout = Data_Explorer_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% -------------------------------------------------------------------------
-function Data_Explorer_Table_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to Data_Explorer_Table (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
 % --- Executes when selected cell(s) is changed in Data_Explorer_Table.
 function Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles)
 % hObject    handle to Data_Explorer_Table (see GCBO)
 % eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
-% if isprop(eventdata,'Indices') && ~isempty(eventdata.Indices) && isfield(handles,'dataclass')
-%     imgdat = handles.dataclass
+
+% Continue only if dataclass exists, if Indices exist and its size(eventdata.Indices,1)==1
+if isprop(eventdata,'Indices') && size(eventdata.Indices,1)==1  && isfield(handles,'dataclass')
+    imnum = eventdata.Indices(1); if get(handles.Show_Hidden_Input,'Value'), imnum = handles.data.imnumshidden(imnum); end
+    imgdat = handles.dataclass.imdata(imnum);
+    axes(handles.Cropped_Image_Axes); imshow(imgdat,[0,handles.data.OD]);
+end
 
 
 % --- Executes when entered data in editable cell(s) in Data_Explorer_Table.
@@ -206,6 +205,15 @@ if images_folder_path ~= 0
     handles.file.inputs.mode = handles.data.mode;
     handles.dataclass = Data_Handler(handles.file.inputs);
     
+    % Add file watch. If it exists from previous folder, turn it off.
+    if isfield(handles.file,'filewatch'), handles.file.filewatch.EnableRaisingEvents = false; end
+    handles.file.filewatch = System.IO.FileSystemWatcher(images_folder_path);
+    handles.file.filewatch.Filter = '*.fits';
+    addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,hObject,handles));
+    if handles.data.auto_update
+        handles.file.filewatch.EnableRaisingEvents = true;
+    end
+    
     % Update all the GUI objects
     set(handles.Select_Folder_Disp,'String',[images_folder_path]);
     set(handles.Image_Count_Disp,'String',['Images: ',num2str(handles.dataclass.imtotal),' Added: ',num2str(handles.dataclass.imadded)]);
@@ -240,6 +248,11 @@ function Max_OD_Input_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% input = str2double(get(hObject,'String'));
+% if input > 0, handles.data.OD = input; end
+% plot_current_image(handles);
+% % Update handles
+% guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -450,6 +463,26 @@ function Condensate_Fraction_Btn_Callback(hObject, eventdata, handles)
 
 
 
+% --- Executes on button press in Auto_Update_Input.
+function Auto_Update_Input_Callback(hObject, eventdata, handles)
+% hObject    handle to Auto_Update_Input (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get the current state of the toggle
+handles.data.auto_update = get(hObject,'Value');
+
+% Set the event to appropriate value, if it exists
+if isfield(handles.file,'filewatch') && handles.data.auto_update==1
+    handles.file.filewatch.EnableRaisingEvents = true;
+%     addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,handles));
+elseif isfield(handles.file,'filewatch') && handles.data.auto_update==0
+    handles.file.filewatch.EnableRaisingEvents = false;
+%     addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,handles));
+end
+
+% Update GUI data
+guidata(hObject, handles);
 
 
 
@@ -492,7 +525,18 @@ handles.data.celldata = data;
 handles.data.imnumshidden = imnumshidden;
 
 
+function eventhandlerFileCreated(source,arg,hObject,handles)
+% full path to the added file is located at arg.FullPath (incl. .fits)
 
+% Wait and update list of images from the data class
+pause(1);
+handles.dataclass = handles.dataclass.folder_scan;
+
+% Update GUI elements
+handles = update_data_table(handles);
+
+% Update GUI data
+guidata(hObject, handles);
 
 
 
