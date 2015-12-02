@@ -528,6 +528,8 @@ handles.data.imnumshidden = imnumshidden;
 function eventhandlerFileCreated(source,arg,hObject,handles)
 % full path to the added file is located at arg.FullPath (incl. .fits)
 
+handles = guidata(hObject);
+
 % Wait and update list of images from the data class
 pause(1);
 handles.dataclass = handles.dataclass.folder_scan;
