@@ -9,8 +9,7 @@ instance.]
 [] 
 Parsing file "C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer.m"
 	(Referenced from: "Compiler Command Line").
-Deleting 1 temporary MEX authorization files.
-Removing: 'C:\Users\Elder\AppData\Local\Temp\mathworks_tmp_01ffc9020_8188.auth'.
+Deleting 0 temporary MEX authorization files.
 Generating file "C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing\readme.txt".
 Packaging...
 Adding custom icon C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer_resources\icon.ico to C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_testing\Data_Explorer.exe.
@@ -19,4 +18,4 @@ Finished embedding CTF archive. Deleting the external CTF archive.
 Creating the bundle...
 Web based installer created at C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer\for_redistribution\MyAppInstaller_web.exe.
 Packaging complete.
-Elapsed packaging time was: 43 seconds.
+Elapsed packaging time was: 32 seconds.

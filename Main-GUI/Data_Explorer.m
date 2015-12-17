@@ -78,7 +78,7 @@ set(handles.Properties_Menu,'Enable','off');
 set(handles.Refresh_Btn,'Enable','off');
 
 % Initialize Needed Variables
-handles.data.OD = 0.5;
+handles.data.OD = 1.5;
 handles.data.cropset = [];
 handles.data.mode = 1;
 handles.data.props.pnames = {'num','name','hide','notes','TOF'};
@@ -231,6 +231,14 @@ function Refresh_Btn_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Update list of images from the data class
+handles.dataclass = handles.dataclass.folder_scan;
+
+% Update GUI elements
+handles = update_data_table(handles);
+
+% Update GUI data
+guidata(hObject, handles);
 
 
 % --- Executes on button press in Crop_Btn.
@@ -531,7 +539,6 @@ function eventhandlerFileCreated(source,arg,hObject,handles)
 handles = guidata(hObject);
 
 % Wait and update list of images from the data class
-pause(1);
 handles.dataclass = handles.dataclass.folder_scan;
 
 % Update GUI elements

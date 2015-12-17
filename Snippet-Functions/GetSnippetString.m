@@ -20,8 +20,8 @@ match_timestamp = datestr(datenum(1));
 match_snippet_line = 'empty';
 
 %%% Set tolerances for snippet match in seconds
-lag = 10;
-advance = 10;
+lag = 15;
+advance = 15;
 
 %%% Identify matching snippet file
 

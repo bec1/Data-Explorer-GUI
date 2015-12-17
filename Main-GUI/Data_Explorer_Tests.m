@@ -20,6 +20,15 @@ processed_file_path = fullfile(processed_folder_path,processed_file_name);
 [~,~,~] = mkdir(processed_folder_path); % This command will NOT overwirte existing files there
 if ~exist(processed_file_path,'file'), save(processed_file_path,'images_folder_path'); end
 
+%% Reset Zoom settings in new image
+axeshand = handles.Blah_Plot;
+L = get(axeshand,{'xlim','ylim'});
+
+axes(axeshand);
+imagesc(new_image);
+
+if size(new_image) == size(old_image), zoom reset; set(axeshand,{'xlim','ylim'},L); end
+
 
 %% Somethign else
 
