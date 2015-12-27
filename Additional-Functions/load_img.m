@@ -1,9 +1,10 @@
-function [ absimg ] = load_img( file_path, replace_bad_pixels )
+function [ absimg, allimgs ] = load_img( file_path, replace_bad_pixels )
 
 %% Description
 % file_path -- a complete path to the image, ex: 'H:\user4\matlab\myfile.txt'
 % OPTIONAL remove_bad_pixels -- should it replace bad pixels? By default, it is yes (= 1).
 % absimg -- log(I_0,I_atoms).
+% allimg -- {absorption OD,inverted OD, With Atoms, Without Atoms, Dark}
 
 %% Procedure
 % Temporarly copy the file to desktop. Figure out is it is .aia or .fits.
@@ -16,9 +17,13 @@ if nargin < 2
     replace_bad_pixels = 1;
 end
 
-%% Copy file to desktop
-temp_path = fileparts(userpath);
-copyfile(file_path,temp_path,'f');
+%% Copy file to desktop to it contains '('
+if ~isempty(strfind(file_path,'('))
+    temp_path = fileparts(userpath);
+    copyfile(file_path,temp_path,'f');
+else
+    temp_path = fileparts(file_path);
+end
 [~,filename,format] = fileparts(file_path); filename = [filename,format]; format = format(2:end);
 
 %% Load .aia image
@@ -35,16 +40,20 @@ if (strcmp(format, 'aia'))
     I_init=1.0*(I_init-I_dark);
     fclose(fid);
     absimg = I_init ./ I_fin;
+    allimgs = {absimg,absimg,I_fin,I_init,I_dark};
 end
 
 %% Load .fits image
 if (strcmp(format, 'fits'))
     data=fitsread(fullfile(temp_path,filename));
     absimg=(data(:,:,2)-data(:,:,3))./(data(:,:,1)-data(:,:,3));
+    allimgs = {absimg, absimg, data(:,:,1), data(:,:,2), data(:,:,3)};
 end
 
 %% Delete the temporary desktop file
-delete(fullfile(temp_path,filename));
+if ~isempty(strfind(file_path,'('))
+    delete(fullfile(temp_path,filename));
+end
 
 %% Replace "bad" pixels with the average of surrounding
 if replace_bad_pixels
@@ -87,6 +96,8 @@ end
 
 %% Compute the absimg
 absimg = log(absimg);
+allimgs{1} = absimg;
+allimgs{2} = absimg;
 
 end
 

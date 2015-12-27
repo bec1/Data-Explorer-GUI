@@ -30,6 +30,13 @@ imagesc(new_image);
 if size(new_image) == size(old_image), zoom reset; set(axeshand,{'xlim','ylim'},L); end
 
 
+%% Marking Images
+h = imfreehand(xHandle);
+pts = round(h.getPosition);
+test(:,:,1)=imdata.crop_OD; test(:,:,2)=imdata.crop_OD; test(:,:,3)=imdata.crop_OD;
+for i=1:size(pts,1), test(pts(i,1),pts(i,2),1:3)=[max(test(:)),0,0]; end
+test = rgb2gray(test);
+
 %% Somethign else
 
 

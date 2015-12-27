@@ -22,7 +22,7 @@ function varargout = Data_Explorer(varargin)
 
 % Edit the above text to modify the response to help Data_Explorer
 
-% Last Modified by GUIDE v2.5 01-Dec-2015 21:17:38
+% Last Modified by GUIDE v2.5 20-Dec-2015 19:22:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -76,16 +76,18 @@ class_inputs.snipfolder = snippet_folder_path;
 % Disable Other Buttons until Folder has been selected
 set(handles.Properties_Menu,'Enable','off');
 set(handles.Refresh_Btn,'Enable','off');
+set(handles.Create_ImageViewer_Btn,'Enable','off');
 
 % Initialize Needed Variables
-handles.data.OD = 1.5;
 handles.data.cropset = [];
 handles.data.mode = 1;
 handles.data.props.pnames = {'num','name','hide','notes','TOF'};
 handles.data.props.widths = {30,150,30,100,50};
 handles.data.props.editables = {false,false,true,true,false};
-handles.data.current = 0;
 handles.data.auto_update = 0;
+
+% Initialize other GUIs handles
+handles.imageviewers = {};
 
 % Choose default command line output for Data_Explorer
 handles.output = hObject;
@@ -110,6 +112,86 @@ function varargout = Data_Explorer_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
+
+
+% --------------------------------------------------------------------
+function App_Settings_Callback(hObject, eventdata, handles)
+% hObject    handle to App_Settings (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in Select_Folder_Btn.
+function Select_Folder_Btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Select_Folder_Btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Prompt user for a directory.
+images_folder_path = uigetdir(fileparts(userpath));
+
+% Validate folder name
+if images_folder_path==0
+    valid_dir = 0;
+else
+    [~,name,~] = fileparts(images_folder_path);
+    expression = '\d\d\d\d-\d\d-\d\d';
+    valid_dir = regexp(name,expression) == 1;
+end
+
+% If the path is valid, update selected path
+if valid_dir
+    % Create data_handler class using provided folder
+    handles.file.inputs.imfolder = images_folder_path;
+    handles.file.inputs.mode = handles.data.mode;
+    handles.dataclass = Data_Handler(handles.file.inputs);
+    
+%     % Add file watch. If it exists from previous folder, turn it off.
+%     if isfield(handles.file,'filewatch'), handles.file.filewatch.EnableRaisingEvents = false; end
+%     handles.file.filewatch = System.IO.FileSystemWatcher(images_folder_path);
+%     handles.file.filewatch.Filter = '*.fits';
+%     addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,hObject,handles));
+%     if handles.data.auto_update
+%         handles.file.filewatch.EnableRaisingEvents = true;
+%     end
+    
+    % Update all the GUI objects
+    set(handles.Select_Folder_Disp,'String',[images_folder_path]);
+    set(handles.Image_Count_Disp,'String',['Images: ',num2str(handles.dataclass.imtotal),' Added: ',num2str(handles.dataclass.imadded)]);
+    handles = update_data_table(handles);
+    set(handles.Properties_Menu,'Enable','on');
+    set(handles.Refresh_Btn,'Enable','on');
+    set(handles.Create_ImageViewer_Btn,'Enable','on');
+end
+
+% Update GUI data
+guidata(hObject, handles);
+
+
+% --------------------------------------------------------------------
+function Properties_Menu_Callback(hObject, eventdata, handles)
+% hObject    handle to Properties_Menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+outp = Properties_Selector();
+if outp.update
+    handles.data.props.pnames = outp.pnames;
+    handles.data.props.widths = outp.widths;
+    handles.data.props.editables = outp.editables;
+    handles = update_data_table(handles);
+    guidata(hObject, handles);
+end
+
+
+
+% --- Executes on button press in Create_ImageViewer_Btn.
+function Create_ImageViewer_Btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Create_ImageViewer_Btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.imageviewers(end+1) = {ImageViewerGUI(handles.output)};
+guidata(hObject, handles);
+
 % --- Executes when selected cell(s) is changed in Data_Explorer_Table.
 function Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles)
 % hObject    handle to Data_Explorer_Table (see GCBO)
@@ -120,8 +202,16 @@ function Data_Explorer_Table_CellSelectionCallback(hObject, eventdata, handles)
 % Continue only if dataclass exists, if Indices exist and its size(eventdata.Indices,1)==1
 if isprop(eventdata,'Indices') && size(eventdata.Indices,1)==1  && isfield(handles,'dataclass')
     imnum = eventdata.Indices(1); if get(handles.Show_Hidden_Input,'Value'), imnum = handles.data.imnumshidden(imnum); end
-    imgdat = handles.dataclass.imdata(imnum);
-    axes(handles.Cropped_Image_Axes); imshow(imgdat,[0,handles.data.OD]);
+    % Update imageviewers if they are set to 0
+    for i = 1:length(handles.imageviewers)
+        if ishandle(handles.imageviewers{i})
+            imhandles = guidata(handles.imageviewers{i});
+            if str2double(get(imhandles.ImNum_Input,'String')) == 0
+                imhandles.obj.path = handles.dataclass.impaths{imnum};
+            end
+            guidata(handles.imageviewers{i},imhandles);
+        end
+    end
 end
 
 
@@ -149,81 +239,12 @@ handles.dataclass = handles.dataclass.savedata(imnum, pname, val);
 guidata(hObject, handles);
 
 
-% --- Executes during object creation, after setting all properties.
-function Data_Explorer_Table_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Data_Explorer_Table (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-
-% --- Executes during object deletion, before destroying properties.
-function Data_Explorer_Table_DeleteFcn(hObject, eventdata, handles)
-% hObject    handle to Data_Explorer_Table (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on key press with focus on Data_Explorer_Table and none of its controls.
-function Data_Explorer_Table_KeyPressFcn(hObject, eventdata, handles)
-% hObject    handle to Data_Explorer_Table (see GCBO)
-% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
-%	Key: name of the key that was pressed, in lower case
-%	Character: character interpretation of the key(s) that was pressed
-%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function Properties_Menu_Callback(hObject, eventdata, handles)
-% hObject    handle to Properties_Menu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-outp = Properties_Selector();
-if outp.update
-    handles.data.props.pnames = outp.pnames;
-    handles.data.props.widths = outp.widths;
-    handles.data.props.editables = outp.editables;
-    handles = update_data_table(handles);
-    guidata(hObject, handles);
-end
 
 
 
-% --- Executes on button press in Select_Folder_Btn.
-function Select_Folder_Btn_Callback(hObject, eventdata, handles)
-% hObject    handle to Select_Folder_Btn (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Prompt user for a directory.
-images_folder_path = uigetdir(fileparts(userpath));
 
-% If the path is valid, update selected path
-if images_folder_path ~= 0
-    % Create data_handler class using provided folder
-    handles.file.inputs.imfolder = images_folder_path;
-    handles.file.inputs.mode = handles.data.mode;
-    handles.dataclass = Data_Handler(handles.file.inputs);
-    
-    % Add file watch. If it exists from previous folder, turn it off.
-    if isfield(handles.file,'filewatch'), handles.file.filewatch.EnableRaisingEvents = false; end
-    handles.file.filewatch = System.IO.FileSystemWatcher(images_folder_path);
-    handles.file.filewatch.Filter = '*.fits';
-    addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,hObject,handles));
-    if handles.data.auto_update
-        handles.file.filewatch.EnableRaisingEvents = true;
-    end
-    
-    % Update all the GUI objects
-    set(handles.Select_Folder_Disp,'String',[images_folder_path]);
-    set(handles.Image_Count_Disp,'String',['Images: ',num2str(handles.dataclass.imtotal),' Added: ',num2str(handles.dataclass.imadded)]);
-    handles = update_data_table(handles);
-    set(handles.Properties_Menu,'Enable','on');
-    set(handles.Refresh_Btn,'Enable','on');
-end
 
-% Update GUI data
-guidata(hObject, handles);
 
 % --- Executes on button press in Refresh_Btn.
 function Refresh_Btn_Callback(hObject, eventdata, handles)
@@ -236,6 +257,16 @@ handles.dataclass = handles.dataclass.folder_scan;
 
 % Update GUI elements
 handles = update_data_table(handles);
+    % Update imageviewers if they are set to 0
+for i = 1:length(handles.imageviewers)
+    if ishandle(handles.imageviewers{i})
+        imhandles = guidata(handles.imageviewers{i});
+        if str2double(get(imhandles.ImNum_Input,'String')) == -1
+            imhandles.obj.path = handles.dataclass.impaths{1};
+        end
+        guidata(handles.imageviewers{i},imhandles);
+    end
+end
 
 % Update GUI data
 guidata(hObject, handles);
@@ -249,98 +280,11 @@ function Crop_Btn_Callback(hObject, eventdata, handles)
 
 
 
-
-
-function Max_OD_Input_Callback(hObject, eventdata, handles)
-% hObject    handle to Max_OD_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% input = str2double(get(hObject,'String'));
-% if input > 0, handles.data.OD = input; end
-% plot_current_image(handles);
-% % Update handles
-% guidata(hObject, handles);
-
-
-% --- Executes during object creation, after setting all properties.
-function Max_OD_Input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Max_OD_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in Max_OD_p_Btn.
-function Max_OD_p_Btn_Callback(hObject, eventdata, handles)
-% hObject    handle to Max_OD_p_Btn (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in Max_OD_m_Btn.
-function Max_OD_m_Btn_Callback(hObject, eventdata, handles)
-% hObject    handle to Max_OD_m_Btn (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
 % --- Executes on button press in Auto_Recrop_Input.
 function Auto_Recrop_Input_Callback(hObject, eventdata, handles)
 % hObject    handle to Auto_Recrop_Input (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-
-function Image1_Axes_Number_Input_Callback(hObject, eventdata, handles)
-% hObject    handle to Image1_Axes_Number_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Image1_Axes_Number_Input as text
-%        str2double(get(hObject,'String')) returns contents of Image1_Axes_Number_Input as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Image1_Axes_Number_Input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Image1_Axes_Number_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function Image2_Axes_Number_Input_Callback(hObject, eventdata, handles)
-% hObject    handle to Image2_Axes_Number_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Image2_Axes_Number_Input as text
-%        str2double(get(hObject,'String')) returns contents of Image2_Axes_Number_Input as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Image2_Axes_Number_Input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Image2_Axes_Number_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 % --- Executes on button press in Copy_Crop_Btn.
@@ -369,97 +313,6 @@ function Auto_Atom_Number_Input_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of Auto_Atom_Number_Input
 
-
-% --- Executes on selection change in Analyzed1_X_Input.
-function Analyzed1_X_Input_Callback(hObject, eventdata, handles)
-% hObject    handle to Analyzed1_X_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed1_X_Input contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from Analyzed1_X_Input
-
-
-% --- Executes during object creation, after setting all properties.
-function Analyzed1_X_Input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Analyzed1_X_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in Analyzed1_Y_Input.
-function Analyzed1_Y_Input_Callback(hObject, eventdata, handles)
-% hObject    handle to Analyzed1_Y_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed1_Y_Input contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from Analyzed1_Y_Input
-
-
-% --- Executes during object creation, after setting all properties.
-function Analyzed1_Y_Input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Analyzed1_Y_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in Analyzed2_X_input.
-function Analyzed2_X_input_Callback(hObject, eventdata, handles)
-% hObject    handle to Analyzed2_X_input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed2_X_input contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from Analyzed2_X_input
-
-
-% --- Executes during object creation, after setting all properties.
-function Analyzed2_X_input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Analyzed2_X_input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in Analyzed2_Y_Input.
-function Analyzed2_Y_Input_Callback(hObject, eventdata, handles)
-% hObject    handle to Analyzed2_Y_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns Analyzed2_Y_Input contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from Analyzed2_Y_Input
-
-
-% --- Executes during object creation, after setting all properties.
-function Analyzed2_Y_Input_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Analyzed2_Y_Input (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 
@@ -546,15 +399,3 @@ handles = update_data_table(handles);
 
 % Update GUI data
 guidata(hObject, handles);
-
-
-
-
-
-
-
-
-
-
-
-
