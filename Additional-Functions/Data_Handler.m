@@ -44,13 +44,13 @@ function obj = Data_Handler(inputs)
     obj.snipfolder = inputs.snipfolder;
     obj.mode       = inputs.mode;
     
-    % Make sure paths to all the functions are in the search list
-    root_dir = fileparts(pwd);
-    addpath(root_dir);
-    addpath(fullfile(root_dir,'Additional-Functions'));
-    addpath(fullfile(root_dir,'Snippet-Functions'));
-    addpath(fullfile(root_dir,'Additional-GUIs'));
-    addpath(fullfile(root_dir,'Main-GUI'));
+%     % Make sure paths to all the functions are in the search list
+%     root_dir = fileparts(pwd);
+%     addpath(root_dir);
+%     addpath(fullfile(root_dir,'Additional-Functions'));
+%     addpath(fullfile(root_dir,'Snippet-Functions'));
+%     addpath(fullfile(root_dir,'Additional-GUIs'));
+%     addpath(fullfile(root_dir,'Main-GUI'));
     
     % setup data file
     obj = obj.setup_data;

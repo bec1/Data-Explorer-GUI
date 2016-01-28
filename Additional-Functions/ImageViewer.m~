@@ -19,8 +19,8 @@ properties
     OD = [0 1.5]    % [Min Max]
     xSliceCenter = 11
     ySliceCenter = 11
-    xSliceWidth = 5
-    ySliceWidth = 5
+    xSliceWidth = 10
+    ySliceWidth = 10
     
     % Marking
     markpts = []
@@ -146,7 +146,7 @@ function imshow_zoom(obj)
     data = obj.imdata{obj.type};
     ytot = size(data,1);
     xtot = size(data,2);
-    xlim = fix(L{1}); ylim = fix(L{2}); if xlim(1)==0, xlim(1) = 1; end; if ylim(1)==0, ylim(1)=1; end
+    xlim = fix(L{1}); ylim = fix(L{2}); if xlim(1)==0, xlim(1) = 1; 
     xsc = fix(obj.xSliceCenter*(xlim(2)-xlim(1)) + xlim(1));
     ysc = fix(obj.ySliceCenter*(ylim(2)-ylim(1)) + ylim(1));
     xsw = obj.xSliceWidth;
@@ -157,7 +157,7 @@ function imshow_zoom(obj)
     
     % Get xslice data
     xs = sum(data(ylim(1):ylim(2),xsc-xsw:xsc+xsw),2);
-    ys = sum(data(ysc-ysw:ysc+ysw,xlim(1):xlim(2)),1);
+    ys = sum(data(ysc-ysw:ysc+ysw,:),1);
     
     % Plot
     axes(obj.xX); plot(xs);

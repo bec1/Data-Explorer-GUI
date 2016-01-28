@@ -95,9 +95,8 @@ if replace_bad_pixels
 end
 
 %% Compute the absimg
-absimg = log(absimg);
-allimgs{1} = absimg;
-allimgs{2} = absimg;
+allimgs{1} = log(absimg);
+allimgs{2} = 1./absimg;
 
 end
 
