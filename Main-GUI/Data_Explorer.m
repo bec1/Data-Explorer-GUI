@@ -87,7 +87,7 @@ if valid_dir
         if isfield(handles.file,'filewatch'), handles.file.filewatch.EnableRaisingEvents = false; end
         handles.file.filewatch = System.IO.FileSystemWatcher(images_folder_path);
         handles.file.filewatch.Filter = '*.fits';
-        addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,hObject,handles));
+        addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,handles.output,handles));
         if handles.data.auto_update
             handles.file.filewatch.EnableRaisingEvents = true;
         end

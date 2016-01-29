@@ -1,0 +1,22 @@
+mcc -C -o DataExplorer -W WinMain:DataExplorer -T link:exe -d C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\DataExplorer\for_testing -v C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer.m 
+Compiler version: 6.1 (R2015b)
+
+Dependency analysis by REQUIREMENTS.
+
+[Warning: Adding path
+"C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI" to Compiler path
+instance.] 
+[] 
+Parsing file "C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Main-GUI\Data_Explorer.m"
+	(Referenced from: "Compiler Command Line").
+Deleting 1 temporary MEX authorization files.
+Removing: 'C:\Users\Elder\AppData\Local\Temp\mathworks_tmp_01264114_4708.auth'.
+Generating file "C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\DataExplorer\for_testing\readme.txt".
+Packaging...
+Adding custom icon C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\DataExplorer_resources\icon.ico to C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\DataExplorer\for_testing\DataExplorer.exe.
+Attempting to embed the CTF archive into the application C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\DataExplorer\for_testing\DataExplorer.exe.
+Finished embedding CTF archive. Deleting the external CTF archive.
+Creating the bundle...
+Web based installer created at C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\DataExplorer\for_redistribution\MyAppInstaller_web.exe.
+Packaging complete.
+Elapsed packaging time was: 1 minutes and 41 seconds.
