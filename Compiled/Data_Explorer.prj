@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="1759090229" file="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Compiled\Data_Explorer.prj" location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Compiled" name="Data_Explorer" preferred-package-location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Compiled\Data_Explorer\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="345202267" file="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Compiled\Data_Explorer.prj" location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Compiled" name="Data_Explorer" preferred-package-location="C:\Users\Elder\Documents\GitHub\Data-Explorer-GUI\Compiled\Data_Explorer\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>Data_Explorer</param.appname>
     <param.icon>${PROJECT_ROOT}\Data_Explorer_resources\icon.ico</param.icon>
     <param.icons>
