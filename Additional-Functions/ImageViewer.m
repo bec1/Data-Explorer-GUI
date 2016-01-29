@@ -17,8 +17,8 @@ properties
     path
     type = 1     % 1:OD, 2:fOD, 3:WA, 4:WoA, 5:Dark
     OD = [0 1.5]    % [Min Max]
-    xSliceCenter = 11
-    ySliceCenter = 11
+    xSliceCenter = 0.5
+    ySliceCenter = 0.5
     xSliceWidth = 5
     ySliceWidth = 5
     
@@ -111,11 +111,12 @@ function obj = set.ySliceCenter(obj,num)
     obj.ySliceCenter = num; imshow_zoom(obj);
 end
 function obj = set.xSliceWidth(obj,num)
-    obj.xSliceWidth = num; imshow_zoom(obj);
+    obj.xSliceWidth = num; %imshow_zoom(obj);
 end
 function obj = set.ySliceWidth(obj,num)
     obj.ySliceWidth = num; imshow_zoom(obj);
 end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Plot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function imshow_zoom(obj)
@@ -164,6 +165,9 @@ function imshow_zoom(obj)
     % Plot
     axes(obj.xX); plot(ylim(1):ylim(2),xs,'black');
     axes(obj.xY); plot(xlim(1):xlim(2),ys,'black');
+    axes(obj.xhand); 
+    line([xsc,xsc],[ylim(1),ylim(2)]);
+    line([xlim(1),xlim(2)],[ysc,ysc]);
     
 end % imshow
 

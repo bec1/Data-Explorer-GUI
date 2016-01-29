@@ -22,7 +22,7 @@ function varargout = ImageViewerGUI(varargin)
 
 % Edit the above text to modify the response to help ImageViewerGUI
 
-% Last Modified by GUIDE v2.5 28-Jan-2016 11:31:58
+% Last Modified by GUIDE v2.5 29-Jan-2016 11:04:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -302,4 +302,23 @@ function Slider_YSlice_CreateFcn(hObject, eventdata, handles)
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
+function SliceWidthInput_Callback(hObject, eventdata, handles)
+handles.obj.xSliceWidth = round(str2double(get(hObject,'String'))/2);
+handles.obj.ySliceWidth = round(str2double(get(hObject,'String'))/2);
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function SliceWidthInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SliceWidthInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
