@@ -146,7 +146,9 @@ function imshow_zoom(obj)
     data = obj.imdata{obj.type};
     ytot = size(data,1);
     xtot = size(data,2);
-    xlim = fix(L{1}); ylim = fix(L{2}); if xlim(1)==0, xlim(1) = 1; end; if ylim(1)==0, ylim(1)=1; end
+    xlim = fix(L{1}); ylim = fix(L{2}); 
+    if xlim(1)<1, xlim(1) = 1; end; if ylim(1)<1, ylim(1)=1; end
+    if xlim(2)>xtot, xlim(2)=xtot; end; if ylim(2)>ytot, ylim(2)=ytot; end
     xsc = fix(obj.xSliceCenter*(xlim(2)-xlim(1)) + xlim(1));
     ysc = fix(obj.ySliceCenter*(ylim(2)-ylim(1)) + ylim(1));
     xsw = obj.xSliceWidth;
@@ -156,12 +158,12 @@ function imshow_zoom(obj)
     if ysc-ysw < 1, ysc = ysw+1; elseif ysc+ysw > ytot, ysc = ytot-ysw; end
     
     % Get xslice data
-    xs = sum(data(ylim(1):ylim(2),xsc-xsw:xsc+xsw),2);
-    ys = sum(data(ysc-ysw:ysc+ysw,xlim(1):xlim(2)),1);
+    xs = mean(data(ylim(1):ylim(2),xsc-xsw:xsc+xsw),2);
+    ys = mean(data(ysc-ysw:ysc+ysw,xlim(1):xlim(2)),1);
     
     % Plot
-    axes(obj.xX); plot(xs);
-    axes(obj.xY); plot(ys);
+    axes(obj.xX); plot(ylim(1):ylim(2),xs,'black');
+    axes(obj.xY); plot(xlim(1):xlim(2),ys,'black');
     
 end % imshow
 

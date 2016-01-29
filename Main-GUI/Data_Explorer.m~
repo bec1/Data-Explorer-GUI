@@ -35,6 +35,8 @@ set(handles.Create_ImageViewer_Btn,'Enable','off');
 
 % Disable things for Mac
 if ~ispc
+    set(handles.Auto_Update_Input,'Enable','off');
+end
 
 % Initialize Needed Variables
 handles.data.cropset = [];
@@ -80,14 +82,16 @@ if valid_dir
     handles.file.inputs.mode = handles.data.mode;
     handles.dataclass = Data_Handler(handles.file.inputs);
     
-%     % Add file watch. If it exists from previous folder, turn it off.
-%     if isfield(handles.file,'filewatch'), handles.file.filewatch.EnableRaisingEvents = false; end
-%     handles.file.filewatch = System.IO.FileSystemWatcher(images_folder_path);
-%     handles.file.filewatch.Filter = '*.fits';
-%     addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,hObject,handles));
-%     if handles.data.auto_update
-%         handles.file.filewatch.EnableRaisingEvents = true;
-%     end
+    % Add file watch. If it exists from previous folder, turn it off.
+    if ispc % Only for windows
+        if isfield(handles.file,'filewatch'), handles.file.filewatch.EnableRaisingEvents = false; end
+        handles.file.filewatch = System.IO.FileSystemWatcher(images_folder_path);
+        handles.file.filewatch.Filter = '*.fits';
+        addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,hObject,handles));
+        if handles.data.auto_update
+            handles.file.filewatch.EnableRaisingEvents = true;
+        end
+    end
     
     % Update all the GUI objects
     set(handles.Select_Folder_Disp,'String',[images_folder_path]);
@@ -130,6 +134,7 @@ if isprop(eventdata,'Indices') && size(eventdata.Indices,1)==1  && isfield(handl
         end
     end
 end
+
 
 function Data_Explorer_Table_CellEditCallback(hObject, eventdata, handles)
 % eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
@@ -182,10 +187,8 @@ handles.data.auto_update = get(hObject,'Value');
 % Set the event to appropriate value, if it exists
 if isfield(handles.file,'filewatch') && handles.data.auto_update==1
     handles.file.filewatch.EnableRaisingEvents = true;
-%     addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,handles));
 elseif isfield(handles.file,'filewatch') && handles.data.auto_update==0
     handles.file.filewatch.EnableRaisingEvents = false;
-%     addlistener(handles.file.filewatch,'Created',@(source,arg) eventhandlerFileCreated(source,arg,handles));
 end
 
 % Update GUI data
@@ -222,6 +225,7 @@ function eventhandlerFileCreated(source,arg,hObject,handles)
 handles = guidata(hObject);
 
 % Wait and update list of images from the data class
+pause(5);
 handles.dataclass = handles.dataclass.folder_scan;
 
 % Update GUI elements
@@ -229,5 +233,3 @@ handles = update_data_table(handles);
 
 % Update GUI data
 guidata(hObject, handles);
-
-

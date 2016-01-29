@@ -134,6 +134,7 @@ if isprop(eventdata,'Indices') && size(eventdata.Indices,1)==1  && isfield(handl
         end
     end
 end
+figure(handles.figure1);
 
 function Data_Explorer_Table_CellEditCallback(hObject, eventdata, handles)
 % eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
@@ -224,6 +225,7 @@ function eventhandlerFileCreated(source,arg,hObject,handles)
 handles = guidata(hObject);
 
 % Wait and update list of images from the data class
+pause(5);
 handles.dataclass = handles.dataclass.folder_scan;
 
 % Update GUI elements
