@@ -133,6 +133,9 @@ if isprop(eventdata,'Indices') && size(eventdata.Indices,1)==1  && isfield(handl
             guidata(handles.imageviewers{i},imhandles);
         end
     end
+elseif isprop(eventdata,'Indices') && size(eventdata.Indices,1)>1  && isfield(handles,'dataclass')
+    % Multiple cells have been selected
+    handles.data.select_rows = eventdata.Indices(:,1);
 end
 figure(handles.figure1);
 
