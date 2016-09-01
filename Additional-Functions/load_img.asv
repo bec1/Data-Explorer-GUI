@@ -58,8 +58,6 @@ for i = 1:length(allimgs)
     allimgs{i} = imresize(allimgs{i}, 1/subsample, 'method', 'box');
 end
 allimgs{1} = (allimgs{4}-allimgs{5}) ./ (allimgs{3}-allimgs{5});
-allimgs{2} = allimgs{1};
-absimg = allimgs{1};
 
 %% Delete the temporary desktop file
 if ~isempty(strfind(file_path,'('))
