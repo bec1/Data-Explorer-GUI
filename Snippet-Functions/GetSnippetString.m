@@ -28,7 +28,7 @@ advance = 15;
 % build snippet filename and convert time strings into serial numbers
 timepart_img_name = img_name(1:19);
 
-format_in = 'mm-dd-yyyy_HH_MM_ss';
+format_in = 'yyyy-mm-dd_HH-MM-ss';
 img_name_serialnumber = datenum(timepart_img_name,format_in);
 
 format_out = 'yyyy-mm-dd';

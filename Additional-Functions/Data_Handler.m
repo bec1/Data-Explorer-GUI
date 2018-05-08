@@ -94,7 +94,7 @@ function obj = folder_scan(obj)
     listing = dir(fullfile(obj.imfolder,'*.fits'));
     obj.imnames = cellfun( @(x) x(1:end-5), {listing(:).name}', 'UniformOutput', false);
     obj.impaths = cellfun( @(x) fullfile(obj.imfolder,x), {listing(:).name}', 'UniformOutput', false);
-    obj.imtimes = cellfun( @(x) datenum(x,'mm-dd-yyyy_HH_MM_SS'), obj.imnames, 'UniformOutput', false);
+    obj.imtimes = cellfun( @(x) datenum(x,'yyyy-mm-dd_HH-MM-ss'), obj.imnames, 'UniformOutput', false);
     obj.imvars  = matlab.lang.makeValidName(obj.imnames);
     obj.imtotal = length(obj.imnames);
     

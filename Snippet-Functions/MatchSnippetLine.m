@@ -22,7 +22,7 @@ function [match_vector] = MatchSnippetLine(img_name,snippet_timestamp,lag,advanc
 % convert snippet and image timestamp into unique serialnumbers
 snippet_timestamp_serialnumber = datenum(snippet_timestamp);
 timepart_img_name = img_name(1:19);
-format_in = 'mm-dd-yyyy_HH_MM_ss';
+format_in = 'yyyy-mm-dd_HH-MM-ss';
 img_name_serialnumber = datenum(timepart_img_name,format_in);
 
 % compare the serialnumbers to get the match
